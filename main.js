@@ -1,6 +1,8 @@
 // Constantes de conversión
 const M3_A_PIES3 = 35.3147; // 1 m³ = 35.3147 pies³
 const KG_A_TON = 0.001;     // 1 kg = 0.001 toneladas
+const BTU_A_KCAL = 0.252;   // 1 BTU = 0.252 kcal
+const SCF_A_M3 = 0.0283;    // 1 SCF (pie cúbico estándar) = 0.0283 m³
 
 // Constantes de costos y precios (valores típicos de la industria)
 const COSTO_CAPITAL_KW = 800;  // USD/kW instalado - valor realista
@@ -80,6 +82,7 @@ function resetearParametros() {
     document.getElementById('turb').value = 38;
     document.getElementById('precio').value = 80;  // Ajustado a un valor más realista (USD/MWh)
     document.getElementById('costo').value = 15;
+    document.getElementById('pc').value = 1400;    // Valor predeterminado para poder calorífico
     
     // Actualizar los valores mostrados
     document.getElementById('pozosValue').textContent = 5;
@@ -90,6 +93,7 @@ function resetearParametros() {
     document.getElementById('turbValue').textContent = 38;
     document.getElementById('precioValue').textContent = 80;  // Actualizado
     document.getElementById('costoValue').textContent = 15;
+    document.getElementById('pcValue').textContent = 1400;    // Actualizado
     
     flujoCalculado = false;
     calcular();
@@ -107,6 +111,7 @@ function calcular() {
     const eficienciaTurbina = parseInt(document.getElementById('turb').value);
     const precioElectricidad = parseInt(document.getElementById('precio').value);
     const costoOperativo = parseInt(document.getElementById('costo').value);
+    const poderCalorificopc = parseInt(document.getElementById('pc').value); // BTU/SCF
     
     // Determinar si necesitamos recalcular el flujo
     if (!flujoCalculado) {
@@ -132,8 +137,9 @@ function calcular() {
     // Convertir de miles de m³/día a m³/día para los cálculos energéticos
     const gasComprimidoM3 = gasComprimido * 1000; // Convertir a m³/día
     
-    // Propiedades del gas
-    const poderCalorifico = 9400; // kcal/m³
+    // Conversión de poder calorífico de BTU/SCF a kcal/m³
+    // 1 BTU/SCF = (BTU/SCF) × (0.252 kcal/BTU) ÷ (0.0283 m³/SCF) = 8.9 × (BTU/SCF) kcal/m³
+    const poderCalorifico = poderCalorificopc * BTU_A_KCAL / SCF_A_M3; // kcal/m³
     
     // Conversión de energía (valor preciso)
     const factorConversion = 0.00116222; // 1 kcal = 0.00116222 kWh
@@ -213,10 +219,12 @@ function calcular() {
     
     // Emisiones y residuos con factores más precisos
     // Factores de emisión para gas natural: CO2 = 2.1 kg/m³, NOx = 0.0018 kg/m³, SO2 = 0.00068 kg/m³
-    const emisionesCO2 = gasComprimidoM3 * 0.0021; // kg CO2/día
-    const emisionesNOx = gasComprimidoM3 * 0.0000018; // kg NOx/día
-    const emisionesSO2 = gasComprimidoM3 * 0.00000068; // kg SO2/día
-    const emisionesCH4 = gasComprimidoM3 * 0.000001; // kg CH4/día (fugas)
+    // Ajustados según poder calorífico (relación con valor estándar de 9,400 kcal/m³)
+    const factorAjuste = poderCalorifico / 9400;
+    const emisionesCO2 = gasComprimidoM3 * 0.0021 * factorAjuste; // kg CO2/día
+    const emisionesNOx = gasComprimidoM3 * 0.0000018 * factorAjuste; // kg NOx/día
+    const emisionesSO2 = gasComprimidoM3 * 0.00000068 * factorAjuste; // kg SO2/día
+    const emisionesCH4 = gasComprimidoM3 * 0.000001 * factorAjuste; // kg CH4/día (fugas)
     
     // Huella de carbono e impacto ambiental
     const intensidadCarbono = emisionesCO2 / energiaEntregada;
@@ -224,10 +232,10 @@ function calcular() {
     
     // Cálculos ambientales anuales
     const emisionesAnualesCO2 = emisionesCO2 * 365 * KG_A_TON;
-    const emisionsAhorradasFlaring = gasExtraido * 1000 * 0.0028 * 365 * KG_A_TON - emisionesAnualesCO2;
+    const emisionsAhorradasFlaring = gasExtraido * 1000 * 0.0028 * factorAjuste * 365 * KG_A_TON - emisionesAnualesCO2;
     const emisionsAhorradasCoal = (900 - intensidadCarbono) * energiaEntregada * 365 * KG_A_TON;
     const emisionsAhorradasOil = (700 - intensidadCarbono) * energiaEntregada * 365 * KG_A_TON;
-    const emisionsAhorradasVenting = gasExtraido * 1000 * 0.0028 * 25 * 365 * KG_A_TON - emisionesAnualesCO2; // CH4 tiene 25 veces más GWP
+    const emisionsAhorradasVenting = gasExtraido * 1000 * 0.0028 * 25 * factorAjuste * 365 * KG_A_TON - emisionesAnualesCO2; // CH4 tiene 25 veces más GWP
     const equivalenteArboles = emisionsAhorradasFlaring * 42; // 1 ton CO2 = ~42 árboles/año
     
     // Guardar resultados para exportación
@@ -240,7 +248,8 @@ function calcular() {
             eficienciaCompresion,
             eficienciaTurbina,
             precioElectricidad,
-            costoOperativo
+            costoOperativo,
+            poderCalorificopc
         },
         produccion: {
             gasExtraido,
@@ -251,7 +260,8 @@ function calcular() {
             energiaTermica,
             energiaElectrica,
             energiaEntregada,
-            capacidadInstalada
+            capacidadInstalada,
+            poderCalorifico
         },
         economico: {
             ingresos,
@@ -299,6 +309,7 @@ function calcular() {
     document.getElementById('energiaGenerada').textContent = energiaElectrica.toFixed(2) + " MWh/día";
     document.getElementById('energiaEntregada').textContent = energiaEntregada.toFixed(2) + " MWh/día";
     document.getElementById('capacidadInstalada').textContent = capacidadInstalada.toFixed(0) + " kW";
+    document.getElementById('poderCalorifico').textContent = poderCalorifico.toFixed(0) + " kcal/m³";
     
     document.getElementById('ingresos').textContent = ingresos.toFixed(2) + " USD/día";
     document.getElementById('costos').textContent = gastos.toFixed(2) + " USD/día";
@@ -393,7 +404,9 @@ function calcular() {
         costoPersonal,
         otrosCostos,
         intensidadCarbono,
-        capacidadInstalada
+        capacidadInstalada,
+        poderCalorifico,
+        poderCalorificopc
     });
 }
 
