@@ -83,6 +83,11 @@ function eliminarConfiguracion(id) {
 function actualizarListaConfiguraciones() {
     const listaConfiguraciones = document.getElementById('listaConfiguraciones');
     
+    if (!listaConfiguraciones) {
+        console.error("Elemento listaConfiguraciones no encontrado");
+        return;
+    }
+    
     if (configuracionesGuardadas.length === 0) {
         listaConfiguraciones.innerHTML = '<p>No hay configuraciones guardadas.</p>';
         return;
@@ -98,8 +103,8 @@ function actualizarListaConfiguraciones() {
                     <small style="display: block; color: #666;">${config.fecha}</small>
                 </div>
                 <div class="actions">
-                    <button class="btn-primary" onclick="cargarConfiguracion(${config.id})"><i class="fas fa-upload"></i></button>
-                    <button class="btn-tertiary" onclick="eliminarConfiguracion(${config.id})"><i class="fas fa-trash"></i></button>
+                    <button class="btn-primary" onclick="cargarConfiguracion(${config.id})"><i class="fas fa-upload"></i> Cargar</button>
+                    <button class="btn-tertiary" onclick="eliminarConfiguracion(${config.id})"><i class="fas fa-trash"></i> Eliminar</button>
                 </div>
             </li>
         `;
