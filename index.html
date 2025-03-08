@@ -4,317 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador de Generación Eléctrica con Gas Asociado</title>
-    <style>
-        * { 
-            box-sizing: border-box; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f5f7fa;
-            color: #333;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-radius: 0;
-            padding: 0;
-        }
-        .header {
-            padding: 15px 20px;
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #ddd;
-        }
-        h1, h2, h3 { 
-            color: #2c3e50; 
-            margin-top: 0;
-        }
-        h1 {
-            font-size: 1.6rem;
-            margin-bottom: 0;
-        }
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid #ddd;
-            background-color: #fff;
-        }
-        .tab {
-            padding: 12px 15px;
-            cursor: pointer;
-            color: #555;
-            font-weight: 600;
-            position: relative;
-            font-size: 0.9rem;
-        }
-        .tab.active {
-            color: #3498db;
-        }
-        .tab.active:after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: #3498db;
-        }
-        .tab-content {
-            display: none;
-            padding: 20px;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .panel {
-            background-color: white;
-            border-radius: 4px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            border: 1px solid #eeeeee;
-        }
-        .panel h2 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
-        }
-        .controls-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-        .control-item {
-            display: flex;
-            flex-direction: column;
-        }
-        label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-        }
-        input[type="range"] {
-            width: 100%;
-            height: 8px;
-            -webkit-appearance: none;
-            appearance: none;
-            background: linear-gradient(to right, #3498db, #2ecc71);
-            border-radius: 5px;
-            outline: none;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: white;
-            border: 2px solid #3498db;
-            cursor: pointer;
-        }
-        .buttons {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            flex-wrap: wrap;
-        }
-        button {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-        button:hover {
-            opacity: 0.9;
-        }
-        button:active {
-            transform: scale(0.98);
-        }
-        .btn-primary {
-            background-color: #3498db;
-            color: white;
-        }
-        .btn-secondary {
-            background-color: #2ecc71;
-            color: white;
-        }
-        .btn-tertiary {
-            background-color: #e74c3c;
-            color: white;
-        }
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-        .result-card {
-            background-color: #f8f9fa;
-            border-radius: 4px;
-            padding: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
-        }
-        .result-card h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
-            font-size: 1rem;
-            color: #444;
-        }
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 0.85rem;
-        }
-        .value {
-            font-weight: bold;
-            color: #2980b9;
-        }
-        .positive { color: #27ae60; }
-        .negative { color: #e74c3c; }
-        
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .chart-container {
-            background-color: white;
-            border-radius: 4px;
-            padding: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
-            height: 300px;
-        }
-        .chart-container h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
-            color: #444;
-        }
-        canvas {
-            width: 100%;
-            height: 230px;
-        }
-        
-        /* Estilos para el flujo del proceso */
-        .process-flow {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            margin: 30px 0;
-            gap: 5px;
-        }
-        .process-step {
-            background-color: #f8f9fa;
-            border-radius: 4px;
-            padding: 15px;
-            width: 150px;
-            text-align: center;
-            border: 1px solid #eee;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .process-step h4 {
-            margin: 0 0 10px 0;
-            font-size: 0.9rem;
-        }
-        .process-step p {
-            margin: 5px 0;
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: #2980b9;
-        }
-        .process-step small {
-            font-size: 0.75rem;
-            color: #666;
-        }
-        .arrow {
-            font-size: 20px;
-            color: #aaa;
-        }
-        
-        /* Estilos para el análisis financiero */
-        .financial-metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .metric-card {
-            background-color: white;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .metric-card .value {
-            font-size: 1.5rem;
-            margin: 10px 0;
-        }
-        .metric-card .label {
-            font-size: 0.8rem;
-            color: #666;
-            font-weight: normal;
-        }
-        
-        /* Estilos para huella ambiental */
-        .environmental-metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .eco-metric {
-            background-color: white;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .eco-metric .value {
-            font-size: 1.5rem;
-            margin: 10px 0;
-        }
-        .eco-metric .label {
-            font-size: 0.8rem;
-            color: #666;
-            font-weight: normal;
-        }
-        
-        @media (max-width: 768px) {
-            .grid-3, .charts-grid {
-                grid-template-columns: 1fr;
-            }
-            .process-flow {
-                flex-direction: column;
-                align-items: center;
-            }
-            .process-step {
-                width: 100%;
-                max-width: 250px;
-            }
-            .arrow {
-                transform: rotate(90deg);
-                margin: 5px 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 </head>
 <body>
@@ -371,7 +61,7 @@
                 
                 <div class="buttons">
                     <button class="btn-primary" onclick="calcular()">Calcular Resultados</button>
-                    <button class="btn-secondary" onclick="toggleUnidades()">Usar Unidades Imperiales</button>
+                    <button class="btn-secondary" id="btn-unidades" onclick="toggleUnidades()">Usar Unidades Imperiales</button>
                     <button class="btn-tertiary" onclick="resetearParametros()">Restablecer Valores</button>
                 </div>
             </div>
@@ -398,6 +88,10 @@
                     <div class="data-row">
                         <span>Energía Entregada:</span>
                         <span class="value" id="energiaEntregada">0 MWh/día</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Capacidad Instalada:</span>
+                        <span class="value" id="capacidadInstalada">0 kW</span>
                     </div>
                 </div>
                 
@@ -471,6 +165,7 @@
                     <canvas id="emissionsChart"></canvas>
                 </div>
             </div>
+            <div class="spacer"></div>
         </div>
         
         <!-- Flujo del Proceso -->
@@ -587,6 +282,7 @@
                     </div>
                 </div>
             </div>
+            <div class="spacer"></div>
         </div>
         
         <!-- Análisis Financiero -->
@@ -694,6 +390,7 @@
                     </div>
                 </div>
             </div>
+            <div class="spacer"></div>
         </div>
         
         <!-- Huella Ambiental -->
@@ -801,819 +498,82 @@
                     </div>
                 </div>
             </div>
+            <div class="spacer"></div>
+        </div>
+        
+        <!-- Pie de página -->
+        <div class="footer">
+            <div class="title">Simulador Avanzado de Generación Eléctrica a partir de Gas Asociado</div>
+            <div class="author">Desarrollado por: Ing. Benito Cabrera R., MBA</div>
+            <div class="copyright">Copyright © 2025. Todos los derechos reservados.</div>
         </div>
     </div>
-
-    <script>
-        // Constantes de conversión
-        const M3_A_PIES3 = 35.3147; // 1 m³ = 35.3147 pies³
-        const KG_A_TON = 0.001;     // 1 kg = 0.001 toneladas
-        
-        // Variables de estado
-        let unidadesImperiales = false;
-        
-        // Instancias de gráficos
-        let productionChart = null;
-        let energyChart = null;
-        let financialChart = null;
-        let emissionsChart = null;
-        let flowChart = null;
-        let efficiencyChart = null;
-        let costBreakdownChart = null;
-        let cashFlowChart = null;
-        let carbonComparisonChart = null;
-        let emissionsCompositionChart = null;
-        
-        // Función para actualizar el valor mostrado al mover los sliders
-        function actualizarValor(id) {
-            document.getElementById(id + 'Value').textContent = document.getElementById(id).value;
-            calcular(); // Recalcular automáticamente al cambiar cualquier valor
-        }
-        
-        // Cambiar entre pestañas
-        function cambiarPestana(id) {
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(id).classList.add('active');
+    
+    <!-- Notificación -->
+    <div id="notificacion" class="notification"></div>
+    
+    <!-- Modales -->
+    <div id="modalConfiguracion" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal('modalConfiguracion')">&times;</span>
+            <h2 class="modal-title">Configuraciones Guardadas</h2>
             
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+            <div class="panel">
+                <h3>Guardar Configuración Actual</h3>
+                <div>
+                    <input type="text" id="nombreConfig" placeholder="Nombre de la configuración" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                    <button class="btn-primary" onclick="guardarConfiguracion()">Guardar</button>
+                </div>
+            </div>
             
-            // Seleccionar el tab correspondiente
-            const tabs = document.querySelectorAll('.tab');
-            for(let i = 0; i < tabs.length; i++) {
-                if(tabs[i].getAttribute('onclick').includes(id)) {
-                    tabs[i].classList.add('active');
-                    break;
-                }
-            }
+            <div class="configuraciones-guardadas">
+                <h3>Configuraciones Disponibles</h3>
+                <div id="listaConfiguraciones">
+                    <p>No hay configuraciones guardadas.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modalExportar" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal('modalExportar')">&times;</span>
+            <h2 class="modal-title">Exportar Datos</h2>
             
-            // Recalcular la pestaña actual
-            calcular();
-        }
-        
-        // Convertir valores según unidades
-        function convertirGas(valor) {
-            if (unidadesImperiales) {
-                return (valor * 1000 * M3_A_PIES3).toFixed(0) + " pies³/día";
-            } else {
-                return valor.toFixed(2) + " miles m³/día";
-            }
-        }
-        
-        function convertirEmisiones(valor) {
-            if (unidadesImperiales) {
-                return (valor * KG_A_TON).toFixed(3) + " ton/día";
-            } else {
-                return valor.toFixed(1) + " kg/día";
-            }
-        }
-        
-        // Cambiar entre unidades métricas e imperiales
-        function toggleUnidades() {
-            unidadesImperiales = !unidadesImperiales;
-            document.querySelector('.btn-secondary').textContent = unidadesImperiales 
-                ? "Usar Unidades Métricas" 
-                : "Usar Unidades Imperiales";
-            calcular();
-        }
-        
-        // Resetear parámetros a valores por defecto
-        function resetearParametros() {
-            document.getElementById('pozos').value = 5;
-            document.getElementById('gas').value = 100;
-            document.getElementById('gor').value = 1000;
-            document.getElementById('sep').value = 85;
-            document.getElementById('comp').value = 90;
-            document.getElementById('turb').value = 38;
-            document.getElementById('precio').value = 75;
-            document.getElementById('costo').value = 15;
-            
-            // Actualizar los valores mostrados
-            document.getElementById('pozosValue').textContent = 5;
-            document.getElementById('gasValue').textContent = 100;
-            document.getElementById('gorValue').textContent = 1000;
-            document.getElementById('sepValue').textContent = 85;
-            document.getElementById('compValue').textContent = 90;
-            document.getElementById('turbValue').textContent = 38;
-            document.getElementById('precioValue').textContent = 75;
-            document.getElementById('costoValue').textContent = 15;
-            
-            calcular();
-        }
-        
-        // Función principal de cálculo
-        function calcular() {
-            // Obtener valores de entrada
-            const pozosActivos = parseInt(document.getElementById('pozos').value);
-            const gasDisponible = parseInt(document.getElementById('gas').value);
-            const GOR = parseInt(document.getElementById('gor').value);
-            const eficienciaSeparacion = parseInt(document.getElementById('sep').value);
-            const eficienciaCompresion = parseInt(document.getElementById('comp').value);
-            const eficienciaTurbina = parseInt(document.getElementById('turb').value);
-            const precioElectricidad = parseInt(document.getElementById('precio').value);
-            const costoOperativo = parseInt(document.getElementById('costo').value);
-            const costoCapital = 1200; // USD/kW instalado (valor fijo)
-            
-            // Variación aleatoria para simular fluctuaciones
-            const variacion = 0.95 + Math.random() * 0.1;
-            
-            // Cálculos para el proceso
-            const gasExtraido = gasDisponible * pozosActivos * variacion;
-            const gasSeparado = gasExtraido * (eficienciaSeparacion/100) * variacion;
-            const gasComprimido = gasSeparado * (eficienciaCompresion/100) * variacion;
-            
-            // Propiedades del gas
-            const poderCalorifico = 9400; // kcal/m³
-            const poderCalorificoTotal = gasComprimido * poderCalorifico;
-            
-            // Energía térmica y eléctrica
-            const energiaTermica = gasComprimido * poderCalorifico * 0.00116; // Conversión a MWh
-            const energiaElectrica = energiaTermica * (eficienciaTurbina/100);
-            const perdidas = energiaElectrica * 0.05; // 5% de pérdidas
-            const energiaEntregada = energiaElectrica - perdidas;
-            
-            // Cálculos económicos
-            const ingresos = energiaEntregada * precioElectricidad;
-            const gastos = energiaEntregada * costoOperativo + (costoCapital * energiaElectrica / 365 / 24);
-            const beneficio = ingresos - gastos;
-            const retornoInversion = (beneficio / gastos) * 100;
-            
-            // Punto de equilibrio
-            const costoFijo = costoCapital * energiaElectrica / 365 / 24;
-            const costoVariable = costoOperativo;
-            const breakeven = costoFijo / (precioElectricidad - costoVariable);
-            
-            // Emisiones y residuos
-            const emisionesCO2 = gasComprimido * 2.1; // kg CO2/m³ gas
-            const emisionesNOx = gasComprimido * 0.005; // kg NOx/m³ gas
-            const emisionesSO2 = gasComprimido * 0.001; // kg SO2/m³ gas
-            const emisionesCH4 = gasComprimido * 0.003; // kg CH4/m³ gas (fugas)
-            const gasNoUtilizado = gasExtraido - gasComprimido;
-            const residuosCombustion = gasComprimido * 0.02; // 2% residuos
-            
-            // Cálculos de petróleo
-            const gasExtraidoPies3 = gasExtraido * 1000 * M3_A_PIES3;
-            const produccionPetroleoDiaria = gasExtraidoPies3 / GOR;
-            
-            // Huella de carbono
-            const intensidadCarbono = emisionesCO2 / energiaEntregada;
-            const reduccionVsCarbon = 100 - (intensidadCarbono / 9);
-            
-            // Cálculos financieros avanzados
-            const ingresosAnuales = ingresos * 365;
-            const gastosAnuales = gastos * 365;
-            const beneficioAnual = beneficio * 365;
-            const inversionInicial = energiaElectrica * 1000 * costoCapital; // USD
-            
-            // Costos desglosados
-            const costoCombustible = gasComprimido * 0.05; // USD/día
-            const costoMantenimiento = energiaElectrica * 3; // USD/día
-            const costoPersonal = pozosActivos * 50; // USD/día
-            const otrosCostos = gastos * 0.1; // USD/día
-            
-            // LCOE y otras métricas
-            const lcoe = (inversionInicial / 20 + gastosAnuales) / (energiaEntregada * 365);
-            const margenOperativo = (beneficio / ingresos) * 100;
-            const precioEquilibrio = gastos / energiaEntregada;
-            const relacionBC = ingresos / gastos;
-            
-            // Cálculos ambientales avanzados
-            const emisionesAnualesCO2 = emisionesCO2 * 365 * KG_A_TON;
-            const emisionsAhorradasFlaring = gasExtraido * 2.8 * 365 * KG_A_TON - emisionesAnualesCO2;
-            const emisionsAhorradasCoal = (900 - intensidadCarbono) * energiaEntregada * 365 * KG_A_TON;
-            const emisionsAhorradasOil = (700 - intensidadCarbono) * energiaEntregada * 365 * KG_A_TON;
-            const emisionsAhorradasVenting = gasExtraido * 2.8 * 25 * 365 * KG_A_TON - emisionesAnualesCO2; // CH4 tiene 25 veces más GWP
-            const equivalenteArboles = emisionsAhorradasFlaring * 42; // 1 ton CO2 = ~42 árboles/año
-            
-            // Actualizar interfaz con resultados
-            // Panel Principal
-            document.getElementById('gasExtraido').textContent = convertirGas(gasExtraido);
-            document.getElementById('gasComprimido').textContent = convertirGas(gasComprimido);
-            document.getElementById('petroDiario').textContent = produccionPetroleoDiaria.toFixed(0) + " bbl/día";
-            document.getElementById('energiaGenerada').textContent = energiaElectrica.toFixed(2) + " MWh/día";
-            document.getElementById('energiaEntregada').textContent = energiaEntregada.toFixed(2) + " MWh/día";
-            
-            document.getElementById('ingresos').textContent = ingresos.toFixed(2) + " USD/día";
-            document.getElementById('costos').textContent = gastos.toFixed(2) + " USD/día";
-            document.getElementById('beneficio').textContent = beneficio.toFixed(2) + " USD/día";
-            document.getElementById('beneficio').className = beneficio > 0 ? "value positive" : "value negative";
-            document.getElementById('roi').textContent = retornoInversion.toFixed(1) + " %";
-            document.getElementById('roi').className = retornoInversion > 0 ? "value positive" : "value negative";
-            document.getElementById('breakeven').textContent = breakeven.toFixed(2) + " MWh/día";
-            
-            document.getElementById('co2').textContent = convertirEmisiones(emisionesCO2);
-            document.getElementById('nox').textContent = convertirEmisiones(emisionesNOx);
-            document.getElementById('so2').textContent = convertirEmisiones(emisionesSO2);
-            document.getElementById('carbon-intensity').textContent = intensidadCarbono.toFixed(1) + " kg CO₂/MWh";
-            document.getElementById('carbon-reduction').textContent = reduccionVsCarbon.toFixed(1) + " %";
-            
-            // Pestaña de Proceso
-            document.getElementById('flowPozo').textContent = convertirGas(gasExtraido);
-            document.getElementById('flowSeparador').textContent = convertirGas(gasSeparado);
-            document.getElementById('flowSepEf').textContent = "Ef: " + eficienciaSeparacion + "%";
-            document.getElementById('flowCompresion').textContent = convertirGas(gasComprimido);
-            document.getElementById('flowCompEf').textContent = "Ef: " + eficienciaCompresion + "%";
-            document.getElementById('flowTurbina').textContent = energiaElectrica.toFixed(1) + " MWh/día";
-            document.getElementById('flowTurbEf').textContent = "Ef: " + eficienciaTurbina + "%";
-            document.getElementById('flowRed').textContent = energiaEntregada.toFixed(1) + " MWh/día";
-            
-            document.getElementById('co2-flow').textContent = convertirEmisiones(emisionesCO2);
-            document.getElementById('nox-flow').textContent = convertirEmisiones(emisionesNOx);
-            document.getElementById('so2-flow').textContent = convertirEmisiones(emisionesSO2);
-            document.getElementById('gasNoUtil').textContent = convertirGas(gasNoUtilizado);
-            
-            document.getElementById('eficiencia-termica').textContent = eficienciaTurbina + " %";
-            document.getElementById('rendimiento-electrico').textContent = (energiaEntregada / energiaTermica * 100).toFixed(1) + " %";
-            document.getElementById('factor-planta').textContent = "85 %";
-            
-            // Pestaña Financiera
-            document.getElementById('ingresosAnuales').textContent = "$" + ingresosAnuales.toFixed(0);
-            document.getElementById('costosAnuales').textContent = "$" + gastosAnuales.toFixed(0);
-            document.getElementById('beneficioAnual').textContent = "$" + beneficioAnual.toFixed(0);
-            document.getElementById('roiAnual').textContent = retornoInversion.toFixed(1) + "%";
-            
-            document.getElementById('inversion-inicial').textContent = "$" + inversionInicial.toFixed(0) + " USD";
-            document.getElementById('van').textContent = "$" + (beneficioAnual * 8).toFixed(0) + " USD"; // Simplificado
-            document.getElementById('tir').textContent = (retornoInversion * 0.8).toFixed(1) + "%";
-            document.getElementById('payback').textContent = (inversionInicial / beneficioAnual).toFixed(1) + " años";
-            
-            document.getElementById('costo-combustible').textContent = "$" + costoCombustible.toFixed(2) + " USD/día";
-            document.getElementById('costo-mantenimiento').textContent = "$" + costoMantenimiento.toFixed(2) + " USD/día";
-            document.getElementById('costo-personal').textContent = "$" + costoPersonal.toFixed(2) + " USD/día";
-            document.getElementById('otros-costos').textContent = "$" + otrosCostos.toFixed(2) + " USD/día";
-            
-            document.getElementById('lcoe').textContent = lcoe.toFixed(2) + " USD/MWh";
-            document.getElementById('margen-operativo').textContent = margenOperativo.toFixed(1) + "%";
-            document.getElementById('precio-equilibrio').textContent = precioEquilibrio.toFixed(2) + " USD/MWh";
-            document.getElementById('relacion-bc').textContent = relacionBC.toFixed(2);
-            
-            // Pestaña Ambiental
-            document.getElementById('co2-annual').textContent = emisionesAnualesCO2.toFixed(0);
-            document.getElementById('emissions-saved').textContent = emisionsAhorradasFlaring.toFixed(0);
-            document.getElementById('carbon-intensity-full').textContent = intensidadCarbono.toFixed(1);
-            document.getElementById('tree-equivalent').textContent = equivalenteArboles.toFixed(0);
-            
-            document.getElementById('co2-detail').textContent = convertirEmisiones(emisionesCO2);
-            document.getElementById('nox-detail').textContent = convertirEmisiones(emisionesNOx);
-            document.getElementById('so2-detail').textContent = convertirEmisiones(emisionesSO2);
-            document.getElementById('ch4-detail').textContent = convertirEmisiones(emisionesCH4);
-            
-            document.getElementById('savings-coal').textContent = emisionsAhorradasCoal.toFixed(0) + " ton CO₂/año";
-            document.getElementById('savings-oil').textContent = emisionsAhorradasOil.toFixed(0) + " ton CO₂/año";
-            document.getElementById('savings-flaring').textContent = emisionsAhorradasFlaring.toFixed(0) + " ton CO₂/año";
-            document.getElementById('savings-venting').textContent = emisionsAhorradasVenting.toFixed(0) + " ton CO₂/año";
-            
-            // Actualizar gráficos
-            actualizarGraficos({
-                gasExtraido, 
-                gasComprimido, 
-                produccionPetroleoDiaria, 
-                energiaTermica, 
-                energiaElectrica, 
-                perdidas, 
-                energiaEntregada, 
-                ingresos, 
-                gastos, 
-                beneficio, 
-                emisionesCO2, 
-                emisionesNOx, 
-                emisionesSO2,
-                emisionesCH4,
-                costoCombustible,
-                costoMantenimiento,
-                costoPersonal,
-                otrosCostos,
-                intensidadCarbono
-            });
-        }
-        
-        // Función para actualizar los gráficos
-        function actualizarGraficos(datos) {
-            // Recuperar la pestaña activa
-            const activeTab = document.querySelector('.tab-content.active').id;
-            
-            // Gráficos del panel principal
-            if (activeTab === 'panel-principal') {
-                // Gráfico de producción
-                if (productionChart) {
-                    productionChart.destroy();
-                }
+            <div class="panel">
+                <h3>Opciones de Exportación</h3>
+                <div class="export-options">
+                    <button class="btn-primary" onclick="exportarInforme()">Exportar Informe Completo (PDF)</button>
+                    <button class="btn-secondary" onclick="exportarInformePersonalizado()">Informe Personalizado</button>
+                    <button class="btn-info" onclick="exportarDatosCompletos()">Exportar Datos (CSV)</button>
+                </div>
                 
-                const ctxProduction = document.getElementById('productionChart').getContext('2d');
-                productionChart = new Chart(ctxProduction, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Producción Diaria'],
-                        datasets: [
-                            {
-                                label: 'Gas (miles m³/día)',
-                                data: [datos.gasExtraido],
-                                backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1,
-                                yAxisID: 'y'
-                            },
-                            {
-                                label: 'Petróleo (bbl/día)',
-                                data: [datos.produccionPetroleoDiaria],
-                                backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                borderWidth: 1,
-                                yAxisID: 'y1'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                position: 'left',
-                                title: {
-                                    display: true,
-                                    text: 'Gas (miles m³/día)'
-                                }
-                            },
-                            y1: {
-                                beginAtZero: true,
-                                position: 'right',
-                                title: {
-                                    display: true,
-                                    text: 'Petróleo (bbl/día)'
-                                },
-                                grid: {
-                                    drawOnChartArea: false
-                                }
-                            }
-                        }
-                    }
-                });
-                
-                // Gráfico de energía
-                if (energyChart) {
-                    energyChart.destroy();
-                }
-                
-                const ctxEnergy = document.getElementById('energyChart').getContext('2d');
-                energyChart = new Chart(ctxEnergy, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Energía Térmica', 'Energía Eléctrica', 'Pérdidas', 'Energía Entregada'],
-                        datasets: [{
-                            label: 'Energía (MWh/día)',
-                            data: [
-                                datos.energiaTermica, 
-                                datos.energiaElectrica, 
-                                datos.perdidas, 
-                                datos.energiaEntregada
-                            ],
-                            backgroundColor: [
-                                'rgba(255, 206, 86, 0.7)',
-                                'rgba(75, 192, 192, 0.7)',
-                                'rgba(255, 99, 132, 0.7)',
-                                'rgba(54, 162, 235, 0.7)'
-                            ],
-                            borderColor: [
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'MWh/día'
-                                }
-                            }
-                        }
-                    }
-                });
-                
-                // Gráfico financiero
-                if (financialChart) {
-                    financialChart.destroy();
-                }
-                
-                const ctxFinancial = document.getElementById('financialChart').getContext('2d');
-                financialChart = new Chart(ctxFinancial, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Análisis Financiero'],
-                        datasets: [
-                            {
-                                label: 'Ingresos',
-                                data: [datos.ingresos],
-                                backgroundColor: 'rgba(46, 204, 113, 0.7)',
-                                borderColor: 'rgba(46, 204, 113, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Costos',
-                                data: [datos.gastos],
-                                backgroundColor: 'rgba(231, 76, 60, 0.7)',
-                                borderColor: 'rgba(231, 76, 60, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Beneficio',
-                                data: [datos.beneficio],
-                                backgroundColor: 'rgba(52, 152, 219, 0.7)',
-                                borderColor: 'rgba(52, 152, 219, 1)',
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'USD/día'
-                                }
-                            }
-                        }
-                    }
-                });
-                
-                // Gráfico de emisiones
-                if (emissionsChart) {
-                    emissionsChart.destroy();
-                }
-                
-                const ctxEmissions = document.getElementById('emissionsChart').getContext('2d');
-                emissionsChart = new Chart(ctxEmissions, {
-                    type: 'pie',
-                    data: {
-                        labels: ['CO₂', 'NOx', 'SO₂'],
-                        datasets: [{
-                            data: [
-                                datos.emisionesCO2, 
-                                datos.emisionesNOx, 
-                                datos.emisionesSO2
-                            ],
-                            backgroundColor: [
-                                'rgba(231, 76, 60, 0.7)',
-                                'rgba(241, 196, 15, 0.7)',
-                                'rgba(52, 152, 219, 0.7)'
-                            ],
-                            borderColor: [
-                                'rgba(231, 76, 60, 1)',
-                                'rgba(241, 196, 15, 1)',
-                                'rgba(52, 152, 219, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                            }
-                        }
-                    }
-                });
-            }
+                <div id="opcionesPersonalizadas" style="display: none; margin-top: 20px;">
+                    <h4>Seleccionar Secciones</h4>
+                    <div style="margin-bottom: 15px;">
+                        <div><input type="checkbox" name="seccion" value="panel-principal" id="check-panel" checked> <label for="check-panel">Panel Principal</label></div>
+                        <div><input type="checkbox" name="seccion" value="proceso" id="check-proceso" checked> <label for="check-proceso">Flujo del Proceso</label></div>
+                        <div><input type="checkbox" name="seccion" value="financiero" id="check-financiero" checked> <label for="check-financiero">Análisis Financiero</label></div>
+                        <div><input type="checkbox" name="seccion" value="ambiental" id="check-ambiental" checked> <label for="check-ambiental">Huella Ambiental</label></div>
+                    </div>
+                    <button class="btn-primary" onclick="generarInformePersonalizado()">Generar Informe</button>
+                </div>
+            </div>
             
-            // Gráficos de la pestaña de proceso
-            else if (activeTab === 'proceso') {
-                // Gráfico de flujo
-                if (flowChart) {
-                    flowChart.destroy();
-                }
-                
-                const ctxFlow = document.getElementById('flowChart').getContext('2d');
-                flowChart = new Chart(ctxFlow, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Gas Extraído', 'Gas Separado', 'Gas Comprimido', 'Gas No Utilizado'],
-                        datasets: [{
-                            label: 'Volumen de Gas',
-                            data: [
-                                datos.gasExtraido,
-                                datos.gasSeparado,
-                                datos.gasComprimido,
-                                datos.gasExtraido - datos.gasComprimido
-                            ],
-                            backgroundColor: [
-                                'rgba(52, 152, 219, 0.7)',
-                                'rgba(46, 204, 113, 0.7)',
-                                'rgba(155, 89, 182, 0.7)',
-                                'rgba(231, 76, 60, 0.7)'
-                            ],
-                            borderColor: [
-                                'rgba(52, 152, 219, 1)',
-                                'rgba(46, 204, 113, 1)',
-                                'rgba(155, 89, 182, 1)',
-                                'rgba(231, 76, 60, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: unidadesImperiales ? 'pies³/día' : 'miles m³/día'
-                                }
-                            }
-                        }
-                    }
-                });
-                
-                // Gráfico de eficiencia
-                if (efficiencyChart) {
-                    efficiencyChart.destroy();
-                }
-                
-                const sepEf = parseInt(document.getElementById('sep').value);
-                const compEf = parseInt(document.getElementById('comp').value);
-                const turbEf = parseInt(document.getElementById('turb').value);
-                const transmissionEf = 95; // 5% de pérdidas
-                const totalEf = (sepEf/100) * (compEf/100) * (turbEf/100) * (transmissionEf/100) * 100;
-                
-                const ctxEfficiency = document.getElementById('efficiencyChart').getContext('2d');
-                efficiencyChart = new Chart(ctxEfficiency, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Separación', 'Compresión', 'Turbina', 'Transmisión', 'Total'],
-                        datasets: [{
-                            label: 'Eficiencia (%)',
-                            data: [
-                                sepEf, 
-                                compEf, 
-                                turbEf, 
-                                transmissionEf, 
-                                totalEf.toFixed(1)
-                            ],
-                            backgroundColor: [
-                                'rgba(46, 204, 113, 0.7)',
-                                'rgba(52, 152, 219, 0.7)',
-                                'rgba(155, 89, 182, 0.7)',
-                                'rgba(52, 73, 94, 0.7)',
-                                'rgba(39, 174, 96, 0.7)'
-                            ],
-                            borderColor: [
-                                'rgba(46, 204, 113, 1)',
-                                'rgba(52, 152, 219, 1)',
-                                'rgba(155, 89, 182, 1)',
-                                'rgba(52, 73, 94, 1)',
-                                'rgba(39, 174, 96, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100,
-                                title: {
-                                    display: true,
-                                    text: 'Eficiencia (%)'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Gráficos de la pestaña financiera
-            else if (activeTab === 'financiero') {
-                // Gráfico de desglose de costos
-                if (costBreakdownChart) {
-                    costBreakdownChart.destroy();
-                }
-                
-                const ctxCostBreakdown = document.getElementById('costBreakdownChart').getContext('2d');
-                costBreakdownChart = new Chart(ctxCostBreakdown, {
-                    type: 'pie',
-                    data: {
-                        labels: ['Combustible', 'Mantenimiento', 'Personal', 'Otros'],
-                        datasets: [{
-                            data: [
-                                datos.costoCombustible,
-                                datos.costoMantenimiento,
-                                datos.costoPersonal,
-                                datos.otrosCostos
-                            ],
-                            backgroundColor: [
-                                'rgba(52, 152, 219, 0.7)',
-                                'rgba(46, 204, 113, 0.7)',
-                                'rgba(155, 89, 182, 0.7)',
-                                'rgba(231, 76, 60, 0.7)'
-                            ],
-                            borderColor: [
-                                'rgba(52, 152, 219, 1)',
-                                'rgba(46, 204, 113, 1)',
-                                'rgba(155, 89, 182, 1)',
-                                'rgba(231, 76, 60, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                            }
-                        }
-                    }
-                });
-                
-                // Gráfico de flujo de caja
-                if (cashFlowChart) {
-                    cashFlowChart.destroy();
-                }
-                
-                const ctxCashFlow = document.getElementById('cashFlowChart').getContext('2d');
-                cashFlowChart = new Chart(ctxCashFlow, {
-                    type: 'line',
-                    data: {
-                        labels: ['Año 1', 'Año 2', 'Año 3', 'Año 4', 'Año 5'],
-                        datasets: [
-                            {
-                                label: 'Ingresos',
-                                data: [
-                                    datos.ingresos * 365,
-                                    datos.ingresos * 365 * 1.02,
-                                    datos.ingresos * 365 * 1.04,
-                                    datos.ingresos * 365 * 1.06,
-                                    datos.ingresos * 365 * 1.08
-                                ],
-                                borderColor: 'rgba(46, 204, 113, 1)',
-                                backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                                borderWidth: 2,
-                                fill: true
-                            },
-                            {
-                                label: 'Costos',
-                                data: [
-                                    datos.gastos * 365,
-                                    datos.gastos * 365 * 1.01,
-                                    datos.gastos * 365 * 1.02,
-                                    datos.gastos * 365 * 1.03,
-                                    datos.gastos * 365 * 1.04
-                                ],
-                                borderColor: 'rgba(231, 76, 60, 1)',
-                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                                borderWidth: 2,
-                                fill: true
-                            },
-                            {
-                                label: 'Beneficio',
-                                data: [
-                                    datos.beneficio * 365,
-                                    datos.beneficio * 365 * 1.03,
-                                    datos.beneficio * 365 * 1.06,
-                                    datos.beneficio * 365 * 1.09,
-                                    datos.beneficio * 365 * 1.12
-                                ],
-                                borderColor: 'rgba(52, 152, 219, 1)',
-                                borderWidth: 2,
-                                borderDash: [5, 5],
-                                fill: false
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'USD/año'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Gráficos de la pestaña ambiental
-            else if (activeTab === 'ambiental') {
-                // Gráfico de comparación de intensidad de carbono
-                if (carbonComparisonChart) {
-                    carbonComparisonChart.destroy();
-                }
-                
-                const ctxCarbonComparison = document.getElementById('carbonComparisonChart').getContext('2d');
-                carbonComparisonChart = new Chart(ctxCarbonComparison, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Carbón', 'Petróleo', 'Gas Natural', 'Gas Asociado (Este Proyecto)', 'Solar', 'Eólica'],
-                        datasets: [{
-                            label: 'Intensidad de Carbono (kg CO₂/MWh)',
-                            data: [900, 700, 400, datos.intensidadCarbono, 50, 15],
-                            backgroundColor: [
-                                'rgba(33, 33, 33, 0.7)',
-                                'rgba(165, 105, 189, 0.7)',
-                                'rgba(241, 196, 15, 0.7)',
-                                'rgba(46, 204, 113, 0.7)',
-                                'rgba(52, 152, 219, 0.7)',
-                                'rgba(26, 188, 156, 0.7)'
-                            ],
-                            borderColor: [
-                                'rgba(33, 33, 33, 1)',
-                                'rgba(165, 105, 189, 1)',
-                                'rgba(241, 196, 15, 1)',
-                                'rgba(46, 204, 113, 1)',
-                                'rgba(52, 152, 219, 1)',
-                                'rgba(26, 188, 156, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'kg CO₂/MWh'
-                                }
-                            }
-                        }
-                    }
-                });
-                
-                // Gráfico de composición de emisiones
-                if (emissionsCompositionChart) {
-                    emissionsCompositionChart.destroy();
-                }
-                
-                const ctxEmissionsComposition = document.getElementById('emissionsCompositionChart').getContext('2d');
-                emissionsCompositionChart = new Chart(ctxEmissionsComposition, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['CO₂', 'NOx', 'SO₂', 'CH₄'],
-                        datasets: [{
-                            data: [
-                                datos.emisionesCO2,
-                                datos.emisionesNOx,
-                                datos.emisionesSO2,
-                                datos.emisionesCH4
-                            ],
-                            backgroundColor: [
-                                'rgba(231, 76, 60, 0.7)',
-                                'rgba(241, 196, 15, 0.7)',
-                                'rgba(52, 152, 219, 0.7)',
-                                'rgba(155, 89, 182, 0.7)'
-                            ],
-                            borderColor: [
-                                'rgba(231, 76, 60, 1)',
-                                'rgba(241, 196, 15, 1)',
-                                'rgba(52, 152, 219, 1)',
-                                'rgba(155, 89, 182, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                            }
-                        }
-                    }
-                });
-            }
-        }
-        
-        // Inicializar al cargar la página
-        document.addEventListener('DOMContentLoaded', function() {
-            calcular();
-        });
-    </script>
+            <div class="panel">
+                <h3>Exportar Datos Específicos</h3>
+                <div class="export-options">
+                    <button class="btn-secondary" onclick="exportarParametros()">Parámetros</button>
+                    <button class="btn-secondary" onclick="exportarDatosFinancieros()">Datos Financieros</button>
+                    <button class="btn-secondary" onclick="exportarDatosAmbientales()">Datos Ambientales</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="main.js"></script>
+    <script src="charts.js"></script>
+    <script src="config.js"></script>
+    <script src="export.js"></script>
 </body>
 </html>
