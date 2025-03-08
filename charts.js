@@ -12,6 +12,9 @@ let emissionsCompositionChart = null;
 
 // Función para actualizar los gráficos
 function actualizarGraficos(datos) {
+    // Crear una copia protegida para evitar modificar los datos originales
+    const datosProtegidos = { ...datos };
+    
     // Recuperar la pestaña activa
     const activeTab = document.querySelector('.tab-content.active').id;
     
@@ -30,7 +33,7 @@ function actualizarGraficos(datos) {
                 datasets: [
                     {
                         label: 'Gas (miles m³/día)',
-                        data: [datos.gasExtraido],
+                        data: [datosProtegidos.gasExtraido],
                         backgroundColor: 'rgba(54, 162, 235, 0.7)',
                         borderColor: 'rgba(54, 162, 235, 1)',
                         borderWidth: 1,
@@ -38,7 +41,7 @@ function actualizarGraficos(datos) {
                     },
                     {
                         label: 'Petróleo (bbl/día)',
-                        data: [datos.produccionPetroleoDiaria],
+                        data: [datosProtegidos.produccionPetroleoDiaria],
                         backgroundColor: 'rgba(75, 192, 192, 0.7)',
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1,
@@ -86,10 +89,10 @@ function actualizarGraficos(datos) {
                 datasets: [{
                     label: 'Energía (MWh/día)',
                     data: [
-                        datos.energiaTermica, 
-                        datos.energiaElectrica, 
-                        datos.perdidas, 
-                        datos.energiaEntregada
+                        datosProtegidos.energiaTermica, 
+                        datosProtegidos.energiaElectrica, 
+                        datosProtegidos.perdidas, 
+                        datosProtegidos.energiaEntregada
                     ],
                     backgroundColor: [
                         'rgba(255, 206, 86, 0.7)',
@@ -134,21 +137,21 @@ function actualizarGraficos(datos) {
                 datasets: [
                     {
                         label: 'Ingresos',
-                        data: [datos.ingresos],
+                        data: [datosProtegidos.ingresos],
                         backgroundColor: 'rgba(46, 204, 113, 0.7)',
                         borderColor: 'rgba(46, 204, 113, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Costos',
-                        data: [datos.gastos],
+                        data: [datosProtegidos.gastos],
                         backgroundColor: 'rgba(231, 76, 60, 0.7)',
                         borderColor: 'rgba(231, 76, 60, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Beneficio',
-                        data: [datos.beneficio],
+                        data: [datosProtegidos.beneficio],
                         backgroundColor: 'rgba(52, 152, 219, 0.7)',
                         borderColor: 'rgba(52, 152, 219, 1)',
                         borderWidth: 1
@@ -182,9 +185,9 @@ function actualizarGraficos(datos) {
                 labels: ['CO₂', 'NOx', 'SO₂'],
                 datasets: [{
                     data: [
-                        datos.emisionesCO2, 
-                        datos.emisionesNOx, 
-                        datos.emisionesSO2
+                        datosProtegidos.emisionesCO2, 
+                        datosProtegidos.emisionesNOx, 
+                        datosProtegidos.emisionesSO2
                     ],
                     backgroundColor: [
                         'rgba(231, 76, 60, 0.7)',
@@ -226,10 +229,10 @@ function actualizarGraficos(datos) {
                 datasets: [{
                     label: 'Volumen de Gas',
                     data: [
-                        datos.gasExtraido,
-                        datos.gasSeparado,
-                        datos.gasComprimido,
-                        datos.gasExtraido - datos.gasComprimido
+                        datosProtegidos.gasExtraido,
+                        datosProtegidos.gasSeparado,
+                        datosProtegidos.gasComprimido,
+                        datosProtegidos.gasNoUtilizado
                     ],
                     backgroundColor: [
                         'rgba(52, 152, 219, 0.7)',
@@ -334,10 +337,10 @@ function actualizarGraficos(datos) {
                 labels: ['Combustible', 'Mantenimiento', 'Personal', 'Otros'],
                 datasets: [{
                     data: [
-                        datos.costoCombustible,
-                        datos.costoMantenimiento,
-                        datos.costoPersonal,
-                        datos.otrosCostos
+                        datosProtegidos.costoCombustible,
+                        datosProtegidos.costoMantenimiento,
+                        datosProtegidos.costoPersonal,
+                        datosProtegidos.otrosCostos
                     ],
                     backgroundColor: [
                         'rgba(52, 152, 219, 0.7)',
@@ -379,11 +382,11 @@ function actualizarGraficos(datos) {
                     {
                         label: 'Ingresos',
                         data: [
-                            datos.ingresos * 365,
-                            datos.ingresos * 365 * 1.02,
-                            datos.ingresos * 365 * 1.04,
-                            datos.ingresos * 365 * 1.06,
-                            datos.ingresos * 365 * 1.08
+                            datosProtegidos.ingresos * 365,
+                            datosProtegidos.ingresos * 365 * 1.02,
+                            datosProtegidos.ingresos * 365 * 1.04,
+                            datosProtegidos.ingresos * 365 * 1.06,
+                            datosProtegidos.ingresos * 365 * 1.08
                         ],
                         borderColor: 'rgba(46, 204, 113, 1)',
                         backgroundColor: 'rgba(46, 204, 113, 0.1)',
@@ -393,11 +396,11 @@ function actualizarGraficos(datos) {
                     {
                         label: 'Costos',
                         data: [
-                            datos.gastos * 365,
-                            datos.gastos * 365 * 1.01,
-                            datos.gastos * 365 * 1.02,
-                            datos.gastos * 365 * 1.03,
-                            datos.gastos * 365 * 1.04
+                            datosProtegidos.gastos * 365,
+                            datosProtegidos.gastos * 365 * 1.01,
+                            datosProtegidos.gastos * 365 * 1.02,
+                            datosProtegidos.gastos * 365 * 1.03,
+                            datosProtegidos.gastos * 365 * 1.04
                         ],
                         borderColor: 'rgba(231, 76, 60, 1)',
                         backgroundColor: 'rgba(231, 76, 60, 0.1)',
@@ -407,11 +410,11 @@ function actualizarGraficos(datos) {
                     {
                         label: 'Beneficio',
                         data: [
-                            datos.beneficio * 365,
-                            datos.beneficio * 365 * 1.03,
-                            datos.beneficio * 365 * 1.06,
-                            datos.beneficio * 365 * 1.09,
-                            datos.beneficio * 365 * 1.12
+                            datosProtegidos.beneficio * 365,
+                            datosProtegidos.beneficio * 365 * 1.03,
+                            datosProtegidos.beneficio * 365 * 1.06,
+                            datosProtegidos.beneficio * 365 * 1.09,
+                            datosProtegidos.beneficio * 365 * 1.12
                         ],
                         borderColor: 'rgba(52, 152, 219, 1)',
                         borderWidth: 2,
@@ -450,7 +453,7 @@ function actualizarGraficos(datos) {
                 labels: ['Carbón', 'Petróleo', 'Gas Natural', 'Gas Asociado (Este Proyecto)', 'Solar', 'Eólica'],
                 datasets: [{
                     label: 'Intensidad de Carbono (kg CO₂/MWh)',
-                    data: [900, 700, 400, datos.intensidadCarbono, 50, 15],
+                    data: [900, 700, 400, datosProtegidos.intensidadCarbono, 50, 15],
                     backgroundColor: [
                         'rgba(33, 33, 33, 0.7)',
                         'rgba(165, 105, 189, 0.7)',
@@ -497,10 +500,10 @@ function actualizarGraficos(datos) {
                 labels: ['CO₂', 'NOx', 'SO₂', 'CH₄'],
                 datasets: [{
                     data: [
-                        datos.emisionesCO2,
-                        datos.emisionesNOx,
-                        datos.emisionesSO2,
-                        datos.emisionesCH4
+                        datosProtegidos.emisionesCO2,
+                        datosProtegidos.emisionesNOx,
+                        datosProtegidos.emisionesSO2,
+                        datosProtegidos.emisionesCH4
                     ],
                     backgroundColor: [
                         'rgba(231, 76, 60, 0.7)',
