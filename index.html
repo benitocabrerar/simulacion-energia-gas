@@ -74,6 +74,10 @@
     <label>Poder Calorífico (BTU/SCF): <span id="pcValue">1400</span></label>
     <input type="range" min="900" max="1800" step="50" value="1400" id="pc" oninput="actualizarValor('pc')">
 </div>
+                    <div class="control-item">
+    <label>Costo Electricidad Diésel (USD/kWh): <span id="costeDieselValue">0.31</span></label>
+    <input type="range" min="0.20" max="0.50" step="0.01" value="0.31" id="costeDiesel" oninput="actualizarValor('costeDiesel')">
+</div>
                 </div>
                 
                 <div class="buttons">
@@ -161,6 +165,29 @@
                         <span>Reducción vs. Carbón:</span>
                         <span class="value positive" id="carbon-reduction">0 %</span>
                     </div>
+                    <div class="result-card">
+    <h3>Comparación con Diésel</h3>
+    <div class="data-row">
+        <span>Costo con Diésel:</span>
+        <span class="value" id="costoDiesel">0 USD/día</span>
+    </div>
+    <div class="data-row">
+        <span>Ahorro Económico:</span>
+        <span class="value positive" id="ahorroDiesel">0 USD/día</span>
+    </div>
+    <div class="data-row">
+        <span>Ahorro Anual:</span>
+        <span class="value positive" id="ahorroDieselAnual">0 USD/año</span>
+    </div>
+    <div class="data-row">
+        <span>CO₂ Evitado Diésel:</span>
+        <span class="value positive" id="co2DieselEvitado">0 kg/día</span>
+    </div>
+    <div class="data-row">
+        <span>Reducción vs. Diésel:</span>
+        <span class="value positive" id="reduccionDiesel">0 %</span>
+    </div>
+</div>
                 </div>
             </div>
             
@@ -204,6 +231,10 @@
                     </h3>
                     <canvas id="emissionsChart"></canvas>
                 </div>
+                <div class="chart-container">
+    <h3>Comparación de Emisiones Gas vs. Diésel</h3>
+    <canvas id="emissionComparisonChart"></canvas>
+</div>
             </div>
         </div>
         
