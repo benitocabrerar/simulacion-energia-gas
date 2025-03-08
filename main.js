@@ -13,6 +13,38 @@ let configuracionesGuardadas = [];
 let ultimosResultados = {};
 let flujoCalculado = false;
 
+// Función para cambiar de pestaña (FUNCIÓN AÑADIDA)
+function cambiarPestana(tabId) {
+    console.log("Cambiando a pestaña:", tabId);
+    
+    // Quitar clase active de todas las pestañas y contenidos
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+        content.style.display = 'none';
+    });
+    
+    // Activar la pestaña seleccionada
+    const tabElement = document.querySelector(`.tab[onclick="cambiarPestana('${tabId}')"]`);
+    if (tabElement) {
+        tabElement.classList.add('active');
+    }
+    
+    const tabContent = document.getElementById(tabId);
+    if (tabContent) {
+        tabContent.classList.add('active');
+        tabContent.style.display = 'block';
+    }
+    
+    // Actualizar gráficos si es necesario
+    if (typeof actualizarGraficos === 'function' && ultimosResultados) {
+        actualizarGraficos(ultimosResultados);
+    }
+}
+
 // Función principal de cálculo - versión simplificada para debug
 function calcular() {
     console.log("Función calcular() ejecutándose");
@@ -74,6 +106,12 @@ function calcular() {
         const retornoInversion = (beneficio * 365 / inversionInicial) * 100;
         const breakeven = costoFijo / ((precioElectricidad - costoOperativo) / 1000);
         
+        // Cálculos para el desglose de costos
+        const costoCombustible = gastos * 0.10; // 10% del total
+        const costoMantenimiento = gastos * 0.35; // 35% del total
+        const costoPersonal = gastos * 0.40; // 40% del total
+        const otrosCostos = gastos * 0.15; // 15% del total
+        
         // Cálculos ambientales
         const factorAjuste = poderCalorifico / 9400;
         const emisionesCO2 = gasComprimidoM3 * 0.0021 * factorAjuste;
@@ -95,6 +133,47 @@ function calcular() {
         
         const co2DieselEvitado = emisionesCO2Diesel - emisionesCO2;
         const reduccionDiesel = (co2DieselEvitado / emisionesCO2Diesel) * 100;
+        
+        // Cálculos financieros adicionales
+        const ingresosAnuales = ingresos * 365;
+        const gastosAnuales = gastos * 365;
+        const beneficioAnual = beneficio * 365;
+        const lcoe = (inversionInicial / (energiaEntregadaKWh * 365 * VIDA_UTIL)) * 1000 + costoOperativo;
+        const margenOperativo = (beneficio / ingresos) * 100;
+        
+        // Cálculos ambientales adicionales
+        const emisionesAnualesCO2 = emisionesCO2 * 365 * KG_A_TON;
+        const emisionsAhorradasFlaring = emisionesAnualesCO2 * 0.8;
+        const emisionsAhorradasCoal = emisionesAnualesCO2 * 1.4;
+        const emisionsAhorradasOil = emisionesAnualesCO2 * 0.9;
+        const emisionsAhorradasVenting = emisionesAnualesCO2 * 2.5;
+        const equivalenteArboles = emisionesAnualesCO2 * 40;
+        
+        // Guardar resultados para uso posterior
+        ultimosResultados = {
+            // Parámetros básicos
+            gasExtraido, gasSeparado, gasComprimido, gasNoUtilizado,
+            energiaTermica, energiaElectrica, perdidas, energiaEntregada,
+            ingresos, gastos, beneficio, emisionesCO2, emisionesNOx, emisionesSO2,
+            emisionesCH4, intensidadCarbono, capacidadInstalada, poderCalorifico,
+            
+            // Económicos
+            inversionInicial, lcoe, margenOperativo, costoCombustible, 
+            costoMantenimiento, costoPersonal, otrosCostos,
+            ingresosAnuales, gastosAnuales, beneficioAnual,
+            
+            // Diésel y comparación
+            emisionesCO2Diesel, emisionesNOxDiesel, emisionesSO2Diesel,
+            co2DieselEvitado, reduccionDiesel, costoDieselDiario, 
+            ahorroDieselDiario, ahorroDieselAnual,
+            
+            // Adicionales para el flujo de proceso
+            produccionPetroleoDiaria: gasExtraido * 1000 * M3_A_PIES3 / GOR,
+            
+            // Ambientales adicionales
+            emisionesAnualesCO2, emisionsAhorradasFlaring, emisionsAhorradasCoal,
+            emisionsAhorradasOil, emisionsAhorradasVenting, equivalenteArboles
+        };
         
         console.log("Cálculos básicos completados");
         
@@ -123,25 +202,55 @@ function calcular() {
         updateElement('carbon-intensity', intensidadCarbono.toFixed(1) + " kg CO₂/MWh");
         updateElement('carbon-reduction', reduccionVsCarbon.toFixed(1) + " %");
         
-        // Actualizar sección de diésel - punto crítico
+        // Actualizar sección de diésel
         updateElement('costoDiesel', costoDieselDiario.toFixed(2) + " USD/día");
         updateElement('ahorroDiesel', ahorroDieselDiario.toFixed(2) + " USD/día");
         updateElement('ahorroDieselAnual', ahorroDieselAnual.toFixed(0) + " USD/año");
         updateElement('co2DieselEvitado', co2DieselEvitado.toFixed(1) + " kg/día");
         updateElement('reduccionDiesel', reduccionDiesel.toFixed(1) + " %");
         
-        console.log("Interfaz actualizada");
+        // Actualizar el panel de proceso
+        updateElement('flowPozo', convertirGas(gasExtraido));
+        updateElement('flowSeparador', convertirGas(gasSeparado));
+        updateElement('flowCompresion', convertirGas(gasComprimido));
+        updateElement('flowTurbina', energiaElectrica.toFixed(2) + " MWh/día");
+        updateElement('flowRed', energiaEntregada.toFixed(2) + " MWh/día");
+        updateElement('flowSepEf', `Ef: ${eficienciaSeparacion}%`);
+        updateElement('flowCompEf', `Ef: ${eficienciaCompresion}%`);
+        updateElement('flowTurbEf', `Ef: ${eficienciaTurbina}%`);
+        updateElement('gasNoUtil', convertirGas(gasNoUtilizado));
+        
+        // Actualizar detalles financieros
+        updateElement('ingresosAnuales', `$${ingresosAnuales.toFixed(0)}`);
+        updateElement('costosAnuales', `$${gastosAnuales.toFixed(0)}`);
+        updateElement('beneficioAnual', `$${beneficioAnual.toFixed(0)}`);
+        updateElement('roiAnual', `${retornoInversion.toFixed(1)}%`);
+        updateElement('inversion-inicial', `$${inversionInicial.toFixed(0)} USD`);
+        updateElement('costo-combustible', `$${costoCombustible.toFixed(2)} USD/día`);
+        updateElement('costo-mantenimiento', `$${costoMantenimiento.toFixed(2)} USD/día`);
+        updateElement('costo-personal', `$${costoPersonal.toFixed(2)} USD/día`);
+        updateElement('otros-costos', `$${otrosCostos.toFixed(2)} USD/día`);
+        updateElement('lcoe', `${lcoe.toFixed(2)} USD/MWh`);
+        updateElement('margen-operativo', `${margenOperativo.toFixed(1)}%`);
+        
+        // Actualizar ambiental detallado
+        updateElement('co2-detail', convertirEmisiones(emisionesCO2));
+        updateElement('nox-detail', convertirEmisiones(emisionesNOx));
+        updateElement('so2-detail', convertirEmisiones(emisionesSO2));
+        updateElement('ch4-detail', convertirEmisiones(emisionesCH4));
+        updateElement('co2-annual', emisionesAnualesCO2.toFixed(1));
+        updateElement('emissions-saved', emisionsAhorradasFlaring.toFixed(1));
+        updateElement('carbon-intensity-full', intensidadCarbono.toFixed(1));
+        updateElement('tree-equivalent', equivalenteArboles.toFixed(0));
+        updateElement('savings-coal', emisionsAhorradasCoal.toFixed(1) + " ton CO₂/año");
+        updateElement('savings-oil', emisionsAhorradasOil.toFixed(1) + " ton CO₂/año");
+        updateElement('savings-flaring', emisionsAhorradasFlaring.toFixed(1) + " ton CO₂/año");
+        updateElement('savings-venting', emisionsAhorradasVenting.toFixed(1) + " ton CO₂/año");
         
         // Actualizar los gráficos si la función existe
         if (typeof actualizarGraficos === 'function') {
             try {
-                actualizarGraficos({
-                    gasExtraido, gasSeparado, gasComprimido, gasNoUtilizado,
-                    energiaTermica, energiaElectrica, perdidas, energiaEntregada,
-                    ingresos, gastos, beneficio, emisionesCO2, emisionesNOx, emisionesSO2,
-                    emisionesCO2Diesel, emisionesNOxDiesel, emisionesSO2Diesel,
-                    intensidadCarbono, capacidadInstalada, poderCalorifico
-                });
+                actualizarGraficos(ultimosResultados);
                 console.log("Gráficos actualizados");
             } catch (error) {
                 console.error("Error al actualizar gráficos:", error);
@@ -329,6 +438,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Cargar configuraciones guardadas
         try {
             configuracionesGuardadas = JSON.parse(localStorage.getItem('configuraciones') || '[]');
+            // Si existe la función para actualizar la lista, llamarla
+            if (typeof actualizarListaConfiguraciones === 'function') {
+                actualizarListaConfiguraciones();
+            }
         } catch (error) {
             console.error("Error al cargar configuraciones guardadas:", error);
             configuracionesGuardadas = [];
