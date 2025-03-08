@@ -55,9 +55,10 @@ function cambiarPestana(id) {
         }
     }
     
-    // IMPORTANTE: NO LLAMAR A calcular() AQUÍ
-    // Solo actualizar los gráficos de la pestaña actual sin recalcular valores
-    actualizarGraficos(window.ultimosDatosCalculados || {});
+    // Actualizar los gráficos de la pestaña actual sin recalcular valores
+    if (window.ultimosDatosCalculados) {
+        actualizarGraficos(window.ultimosDatosCalculados);
+    }
 }
 
 // Convertir valores según unidades
@@ -89,7 +90,9 @@ function toggleUnidades() {
     
     // Actualizar gráficos de la pestaña actual
     const pestanaActiva = document.querySelector('.tab-content.active').id;
-    actualizarGraficos(window.ultimosDatosCalculados || {});
+    if (window.ultimosDatosCalculados) {
+        actualizarGraficos(window.ultimosDatosCalculados);
+    }
 }
 
 // Resetear parámetros a valores por defecto
@@ -310,6 +313,7 @@ function calcular() {
         ingresos: ingresos,
         gastos: gastos,
         beneficio: beneficio,
+        retornoInversion: retornoInversion,
         emisionesCO2: emisionesCO2,
         emisionesNOx: emisionesNOx,
         emisionesSO2: emisionesSO2,
@@ -319,87 +323,157 @@ function calcular() {
         costoPersonal: costoPersonal || 0,
         otrosCostos: otrosCostos || 0,
         intensidadCarbono: intensidadCarbono,
-        capacidadInstalada: capacidadInstalada
+        capacidadInstalada: capacidadInstalada,
+        reduccionVsCarbon: reduccionVsCarbon
     };
     
     // Actualizar interfaz con resultados
     actualizarInterfazConResultados();
     
     // Actualizar gráficos
-    actualizarGraficos({
-        gasExtraido, 
-        gasSeparado,
-        gasComprimido, 
-        gasNoUtilizado,
-        produccionPetroleoDiaria, 
-        energiaTermica, 
-        energiaElectrica, 
-        perdidas, 
-        energiaEntregada, 
-        ingresos, 
-        gastos, 
-        beneficio, 
-        emisionesCO2, 
-        emisionesNOx, 
-        emisionesSO2,
-        emisionesCH4,
-        costoCombustible,
-        costoMantenimiento,
-        costoPersonal,
-        otrosCostos,
-        intensidadCarbono,
-        capacidadInstalada
-    });
+    actualizarGraficos(window.ultimosDatosCalculados);
 }
 
 // Función para actualizar solo la interfaz con los resultados
 function actualizarInterfazConResultados() {
     if (!window.ultimosDatosCalculados) return;
     
-    const { gasExtraido, gasComprimido, gasNoUtilizado, produccionPetroleoDiaria, 
-            energiaElectrica, energiaEntregada, ingresos, gastos, beneficio, retornoInversion,
-            emisionesCO2, emisionesNOx, emisionesSO2, intensidadCarbono, 
-            reduccionVsCarbon, capacidadInstalada } = window.ultimosDatosCalculados;
+    const datos = window.ultimosDatosCalculados;
     
     // Panel Principal
-    document.getElementById('gasExtraido').textContent = convertirGas(gasExtraido);
-    document.getElementById('gasComprimido').textContent = convertirGas(gasComprimido);
-    document.getElementById('petroDiario').textContent = produccionPetroleoDiaria.toFixed(0) + " bbl/día";
-    document.getElementById('energiaGenerada').textContent = energiaElectrica.toFixed(2) + " MWh/día";
-    document.getElementById('energiaEntregada').textContent = energiaEntregada.toFixed(2) + " MWh/día";
-    document.getElementById('capacidadInstalada').textContent = capacidadInstalada.toFixed(0) + " kW";
+    document.getElementById('gasExtraido').textContent = convertirGas(datos.gasExtraido);
+    document.getElementById('gasComprimido').textContent = convertirGas(datos.gasComprimido);
+    document.getElementById('petroDiario').textContent = datos.produccionPetroleoDiaria.toFixed(0) + " bbl/día";
+    document.getElementById('energiaGenerada').textContent = datos.energiaElectrica.toFixed(2) + " MWh/día";
+    document.getElementById('energiaEntregada').textContent = datos.energiaEntregada.toFixed(2) + " MWh/día";
+    document.getElementById('capacidadInstalada').textContent = datos.capacidadInstalada.toFixed(0) + " kW";
     
-    document.getElementById('ingresos').textContent = ingresos.toFixed(2) + " USD/día";
-    document.getElementById('costos').textContent = gastos.toFixed(2) + " USD/día";
-    document.getElementById('beneficio').textContent = beneficio.toFixed(2) + " USD/día";
-    document.getElementById('beneficio').className = beneficio > 0 ? "value positive" : "value negative";
-    document.getElementById('roi').textContent = retornoInversion.toFixed(1) + " %";
-    document.getElementById('roi').className = retornoInversion > 0 ? "value positive" : "value negative";
+    document.getElementById('ingresos').textContent = datos.ingresos.toFixed(2) + " USD/día";
+    document.getElementById('costos').textContent = datos.gastos.toFixed(2) + " USD/día";
+    document.getElementById('beneficio').textContent = datos.beneficio.toFixed(2) + " USD/día";
+    document.getElementById('beneficio').className = datos.beneficio > 0 ? "value positive" : "value negative";
+    document.getElementById('roi').textContent = datos.retornoInversion.toFixed(1) + " %";
+    document.getElementById('roi').className = datos.retornoInversion > 0 ? "value positive" : "value negative";
     if (document.getElementById('breakeven')) {
         document.getElementById('breakeven').textContent = (ultimosResultados.economico.breakeven).toFixed(2) + " MWh/día";
     }
     
-    document.getElementById('co2').textContent = convertirEmisiones(emisionesCO2);
-    document.getElementById('nox').textContent = convertirEmisiones(emisionesNOx);
-    document.getElementById('so2').textContent = convertirEmisiones(emisionesSO2);
-    document.getElementById('carbon-intensity').textContent = intensidadCarbono.toFixed(1) + " kg CO₂/MWh";
-    document.getElementById('carbon-reduction').textContent = reduccionVsCarbon.toFixed(1) + " %";
+    document.getElementById('co2').textContent = convertirEmisiones(datos.emisionesCO2);
+    document.getElementById('nox').textContent = convertirEmisiones(datos.emisionesNOx);
+    document.getElementById('so2').textContent = convertirEmisiones(datos.emisionesSO2);
+    document.getElementById('carbon-intensity').textContent = datos.intensidadCarbono.toFixed(1) + " kg CO₂/MWh";
+    document.getElementById('carbon-reduction').textContent = datos.reduccionVsCarbon.toFixed(1) + " %";
     
-    // Actualizar pestaña de proceso
+    // Actualizar pestaña de proceso si está visible
     if (document.getElementById('flowPozo')) {
-        document.getElementById('flowPozo').textContent = convertirGas(gasExtraido);
-        document.getElementById('flowSeparador').textContent = convertirGas(window.ultimosDatosCalculados.gasSeparado);
-        document.getElementById('flowCompresion').textContent = convertirGas(gasComprimido);
-        document.getElementById('flowTurbina').textContent = energiaElectrica.toFixed(1) + " MWh/día";
-        document.getElementById('flowRed').textContent = energiaEntregada.toFixed(1) + " MWh/día";
+        document.getElementById('flowPozo').textContent = convertirGas(datos.gasExtraido);
+        document.getElementById('flowSeparador').textContent = convertirGas(datos.gasSeparado);
+        document.getElementById('flowCompresion').textContent = convertirGas(datos.gasComprimido);
+        document.getElementById('flowTurbina').textContent = datos.energiaElectrica.toFixed(1) + " MWh/día";
+        document.getElementById('flowRed').textContent = datos.energiaEntregada.toFixed(1) + " MWh/día";
         
-        document.getElementById('co2-flow').textContent = convertirEmisiones(emisionesCO2);
-        document.getElementById('nox-flow').textContent = convertirEmisiones(emisionesNOx);
-        document.getElementById('so2-flow').textContent = convertirEmisiones(emisionesSO2);
-        document.getElementById('gasNoUtil').textContent = convertirGas(gasNoUtilizado);
+        document.getElementById('flowSepEf').textContent = "Ef: " + document.getElementById('sep').value + "%";
+        document.getElementById('flowCompEf').textContent = "Ef: " + document.getElementById('comp').value + "%";
+        document.getElementById('flowTurbEf').textContent = "Ef: " + document.getElementById('turb').value + "%";
+        
+        document.getElementById('co2-flow').textContent = convertirEmisiones(datos.emisionesCO2);
+        document.getElementById('nox-flow').textContent = convertirEmisiones(datos.emisionesNOx);
+        document.getElementById('so2-flow').textContent = convertirEmisiones(datos.emisionesSO2);
+        document.getElementById('gasNoUtil').textContent = convertirGas(datos.gasNoUtilizado);
+        
+        // Actualizar los valores de eficiencia
+        if (document.getElementById('eficiencia-termica')) {
+            document.getElementById('eficiencia-termica').textContent = document.getElementById('turb').value + " %";
+        }
+        if (document.getElementById('rendimiento-electrico')) {
+            const rendimientoElectrico = (datos.energiaEntregada / datos.energiaTermica * 100).toFixed(1);
+            document.getElementById('rendimiento-electrico').textContent = rendimientoElectrico + " %";
+        }
+        if (document.getElementById('factor-planta')) {
+            document.getElementById('factor-planta').textContent = (FACTOR_PLANTA * 100).toFixed(1) + " %";
+        }
     }
     
-    // Actualizar otras secciones según sea necesario
+    // Actualizar pestaña financiera si está visible
+    if (document.getElementById('ingresosAnuales')) {
+        document.getElementById('ingresosAnuales').textContent = "$" + (datos.ingresos * 365).toFixed(0);
+        document.getElementById('costosAnuales').textContent = "$" + (datos.gastos * 365).toFixed(0);
+        document.getElementById('beneficioAnual').textContent = "$" + (datos.beneficio * 365).toFixed(0);
+        document.getElementById('roiAnual').textContent = datos.retornoInversion.toFixed(1) + "%";
+        
+        if (document.getElementById('inversion-inicial') && ultimosResultados.economico) {
+            document.getElementById('inversion-inicial').textContent = "$" + ultimosResultados.economico.inversionInicial.toFixed(0) + " USD";
+        }
+        if (document.getElementById('van') && ultimosResultados.economico) {
+            document.getElementById('van').textContent = "$" + ultimosResultados.economico.van.toFixed(0) + " USD";
+        }
+        if (document.getElementById('tir') && ultimosResultados.economico) {
+            document.getElementById('tir').textContent = ultimosResultados.economico.tir.toFixed(1) + "%";
+        }
+        if (document.getElementById('payback') && ultimosResultados.economico) {
+            document.getElementById('payback').textContent = ultimosResultados.economico.payback.toFixed(1) + " años";
+        }
+        
+        if (document.getElementById('costo-combustible')) {
+            document.getElementById('costo-combustible').textContent = "$" + datos.costoCombustible.toFixed(2) + " USD/día";
+        }
+        if (document.getElementById('costo-mantenimiento')) {
+            document.getElementById('costo-mantenimiento').textContent = "$" + datos.costoMantenimiento.toFixed(2) + " USD/día";
+        }
+        if (document.getElementById('costo-personal')) {
+            document.getElementById('costo-personal').textContent = "$" + datos.costoPersonal.toFixed(2) + " USD/día";
+        }
+        if (document.getElementById('otros-costos')) {
+            document.getElementById('otros-costos').textContent = "$" + datos.otrosCostos.toFixed(2) + " USD/día";
+        }
+        
+        if (document.getElementById('lcoe') && ultimosResultados.economico) {
+            document.getElementById('lcoe').textContent = ultimosResultados.economico.lcoe.toFixed(2) + " USD/MWh";
+        }
+        if (document.getElementById('margen-operativo') && ultimosResultados.economico) {
+            document.getElementById('margen-operativo').textContent = ultimosResultados.economico.margenOperativo.toFixed(1) + "%";
+        }
+        if (document.getElementById('precio-equilibrio') && ultimosResultados.economico) {
+            document.getElementById('precio-equilibrio').textContent = ultimosResultados.economico.precioEquilibrio.toFixed(2) + " USD/MWh";
+        }
+        if (document.getElementById('relacion-bc') && ultimosResultados.economico) {
+            document.getElementById('relacion-bc').textContent = ultimosResultados.economico.relacionBC.toFixed(2);
+        }
+    }
+    
+    // Actualizar pestaña ambiental si está visible
+    if (document.getElementById('co2-annual') && ultimosResultados.ambiental) {
+        document.getElementById('co2-annual').textContent = ultimosResultados.ambiental.emisionesAnualesCO2.toFixed(1);
+        document.getElementById('emissions-saved').textContent = ultimosResultados.ambiental.emisionsAhorradasFlaring.toFixed(1);
+        document.getElementById('carbon-intensity-full').textContent = datos.intensidadCarbono.toFixed(1);
+        document.getElementById('tree-equivalent').textContent = ultimosResultados.ambiental.equivalenteArboles.toFixed(0);
+        
+        if (document.getElementById('co2-detail')) {
+            document.getElementById('co2-detail').textContent = convertirEmisiones(datos.emisionesCO2);
+        }
+        if (document.getElementById('nox-detail')) {
+            document.getElementById('nox-detail').textContent = convertirEmisiones(datos.emisionesNOx);
+        }
+        if (document.getElementById('so2-detail')) {
+            document.getElementById('so2-detail').textContent = convertirEmisiones(datos.emisionesSO2);
+        }
+        if (document.getElementById('ch4-detail')) {
+            document.getElementById('ch4-detail').textContent = convertirEmisiones(datos.emisionesCH4);
+        }
+        
+        if (document.getElementById('savings-coal') && ultimosResultados.ambiental) {
+            document.getElementById('savings-coal').textContent = ultimosResultados.ambiental.emisionsAhorradasCoal.toFixed(1) + " ton CO₂/año";
+        }
+        if (document.getElementById('savings-oil') && ultimosResultados.ambiental) {
+            document.getElementById('savings-oil').textContent = ultimosResultados.ambiental.emisionsAhorradasOil.toFixed(1) + " ton CO₂/año";
+        }
+        if (document.getElementById('savings-flaring') && ultimosResultados.ambiental) {
+            document.getElementById('savings-flaring').textContent = ultimosResultados.ambiental.emisionsAhorradasFlaring.toFixed(1) + " ton CO₂/año";
+        }
+        if (document.getElementById('savings-venting') && ultimosResultados.ambiental) {
+            document.getElementById('savings-venting').textContent = ultimosResultados.ambiental.emisionsAhorradasVenting.toFixed(1) + " ton CO₂/año";
+        }
+    }
 }
 
 // Mostrar notificación
@@ -460,4 +534,3 @@ document.addEventListener('DOMContentLoaded', function() {
     // Cargar configuraciones guardadas del localStorage
     configuracionesGuardadas = JSON.parse(localStorage.getItem('configuraciones') || '[]');
 });
-}
