@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulación de Generación Eléctrica con Gas Asociado</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -120,6 +121,22 @@
             margin-top: 30px;
             color: #7f8c8d;
             font-size: 12px;
+        }
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
     </style>
 </head>
@@ -281,6 +298,28 @@
                         <span>Anual:</span>
                         <span class="value" id="energiaAnual">0 MWh/año</span>
                     </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>Gráficos</h2>
+            <div class="charts-container">
+                <div class="chart-container">
+                    <h3>Flujo del Proceso</h3>
+                    <canvas id="flowChart" height="250"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Generación Eléctrica</h3>
+                    <canvas id="energyChart" height="250"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Análisis Económico</h3>
+                    <canvas id="economicChart" height="250"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Emisiones</h3>
+                    <canvas id="emissionsChart" height="250"></canvas>
                 </div>
             </div>
         </div>
@@ -524,6 +563,150 @@
             document.getElementById('beneficioAnual').className = beneficio > 0 ? "value positive" : "value negative";
             document.getElementById('roiAnual').textContent = retornoInversion.toFixed(1) + "%";
             document.getElementById('roiAnual').className = retornoInversion > 0 ? "value positive" : "value negative";
+            
+            // Gráficos
+            // Flujo del proceso
+            const flowCtx = document.getElementById('flowChart').getContext('2d');
+            if (window.flowChartInstance) {
+                window.flowChartInstance.destroy();
+            }
+            window.flowChartInstance = new Chart(flowCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Gas Extraído', 'Gas Separado', 'Gas Comprimido', 'Gas No Utilizado', 'Residuos'],
+                    datasets: [{
+                        label: unidadesImperiales ? 'Volumen (pies³/día)' : 'Volumen (miles m³/día)',
+                        data: [
+                            gasExtraido,
+                            gasSeparado,
+                            gasComprimido,
+                            gasNoUtilizado,
+                            residuosCombustion
+                        ],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(255, 99, 132, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: unidadesImperiales ? 'Pies³/día' : 'Miles m³/día'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Generación eléctrica
+            const energyCtx = document.getElementById('energyChart').getContext('2d');
+            if (window.energyChartInstance) {
+                window.energyChartInstance.destroy();
+            }
+            window.energyChartInstance = new Chart(energyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Energía Térmica', 'Energía Eléctrica', 'Pérdidas', 'Energía Entregada'],
+                    datasets: [{
+                        label: 'Energía (MWh/día)',
+                        data: [
+                            energiaTermica,
+                            energiaElectrica,
+                            perdidas,
+                            energiaEntregada
+                        ],
+                        backgroundColor: [
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'MWh/día'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Análisis económico
+            const economicCtx = document.getElementById('economicChart').getContext('2d');
+            if (window.economicChartInstance) {
+                window.economicChartInstance.destroy();
+            }
+            window.economicChartInstance = new Chart(economicCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Ingresos', 'Gastos'],
+                    datasets: [{
+                        data: [ingresos, gastos],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(255, 99, 132, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: $${context.raw.toFixed(2)} USD/día`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Emisiones
+            const emissionsCtx = document.getElementById('emissionsChart').getContext('2d');
+            if (window.emissionsChartInstance) {
+                window.emissionsChartInstance.destroy();
+            }
+            window.emissionsChartInstance = new Chart(emissionsCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['CO2', 'NOx', 'SO2'],
+                    datasets: [{
+                        data: [emisionesCO2, emisionesNOx, emisionesSO2],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(153, 102, 255, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw.toFixed(2)} ${unidadesImperiales ? 'ton/día' : 'kg/día'}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
         
         // Cambiar entre unidades métricas e imperiales
