@@ -71,13 +71,13 @@
                         <input type="range" min="5" max="40" value="15" id="costo" oninput="actualizarValor('costo')">
                     </div>
                     <div class="control-item">
-    <label>Poder Calorífico (BTU/SCF): <span id="pcValue">1400</span></label>
-    <input type="range" min="900" max="1800" step="50" value="1400" id="pc" oninput="actualizarValor('pc')">
-</div>
+                        <label>Poder Calorífico (BTU/SCF): <span id="pcValue">1400</span></label>
+                        <input type="range" min="900" max="1800" step="50" value="1400" id="pc" oninput="actualizarValor('pc')">
+                    </div>
                     <div class="control-item">
-    <label>Costo Electricidad Diésel (USD/kWh): <span id="costeDieselValue">0.31</span></label>
-    <input type="range" min="0.20" max="0.50" step="0.01" value="0.31" id="costeDiesel" oninput="actualizarValor('costeDiesel')">
-</div>
+                        <label>Costo Electricidad Diésel (USD/kWh): <span id="costeDieselValue">0.31</span></label>
+                        <input type="range" min="0.20" max="0.50" step="0.01" value="0.31" id="costeDiesel" oninput="actualizarValor('costeDiesel')">
+                    </div>
                 </div>
                 
                 <div class="buttons">
@@ -88,106 +88,106 @@
             </div>
             
             <div class="result-card">
-    <h3>Producción de Gas</h3>
-    <div class="data-row">
-        <span>Gas Extraído:</span>
-        <span class="value" id="gasExtraido">0 miles m³/día</span>
-    </div>
-    <div class="data-row">
-        <span>Gas Procesado:</span>
-        <span class="value" id="gasComprimido">0 miles m³/día</span>
-    </div>
-    <div class="data-row">
-        <span>Petróleo Asociado:</span>
-        <span class="value" id="petroDiario">0 bbl/día</span>
-    </div>
-    <div class="data-row">
-        <span>Energía Generada:</span>
-        <span class="value" id="energiaGenerada">0 MWh/día</span>
-    </div>
-    <div class="data-row">
-        <span>Energía Entregada:</span>
-        <span class="value" id="energiaEntregada">0 MWh/día</span>
-    </div>
-    <div class="data-row">
-        <span>Capacidad Instalada:</span>
-        <span class="value" id="capacidadInstalada">0 kW</span>
-    </div>
+                <h3>Producción de Gas</h3>
                 <div class="data-row">
-    <span>Poder Calorífico:</span>
-    <span class="value" id="poderCalorifico">0 kcal/m³</span>
-</div>
-</div>
-                
-                <div class="result-card">
-                    <h3>Análisis Económico</h3>
-                    <div class="data-row">
-                        <span>Ingresos:</span>
-                        <span class="value" id="ingresos">0 USD/día</span>
-                    </div>
-                    <div class="data-row">
-                        <span>Costos:</span>
-                        <span class="value" id="costos">0 USD/día</span>
-                    </div>
-                    <div class="data-row">
-                        <span>Beneficio:</span>
-                        <span class="value" id="beneficio">0 USD/día</span>
-                    </div>
-                    <div class="data-row">
-                        <span>ROI:</span>
-                        <span class="value" id="roi">0 %</span>
-                    </div>
-                    <div class="data-row">
-                        <span>Punto de Equilibrio:</span>
-                        <span class="value" id="breakeven">0 MWh/día</span>
-                    </div>
+                    <span>Gas Extraído:</span>
+                    <span class="value" id="gasExtraido">0 miles m³/día</span>
                 </div>
+                <div class="data-row">
+                    <span>Gas Procesado:</span>
+                    <span class="value" id="gasComprimido">0 miles m³/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Petróleo Asociado:</span>
+                    <span class="value" id="petroDiario">0 bbl/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Energía Generada:</span>
+                    <span class="value" id="energiaGenerada">0 MWh/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Energía Entregada:</span>
+                    <span class="value" id="energiaEntregada">0 MWh/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Capacidad Instalada:</span>
+                    <span class="value" id="capacidadInstalada">0 kW</span>
+                </div>
+                <div class="data-row">
+                    <span>Poder Calorífico:</span>
+                    <span class="value" id="poderCalorifico">0 kcal/m³</span>
+                </div>
+            </div>
                 
-                <div class="result-card">
-                    <h3>Huella Ambiental</h3>
-                    <div class="data-row">
-                        <span>Emisiones CO₂:</span>
-                        <span class="value" id="co2">0 kg/día</span>
-                    </div>
-                    <div class="data-row">
-                        <span>Emisiones NOx:</span>
-                        <span class="value" id="nox">0 kg/día</span>
-                    </div>
-                    <div class="data-row">
-                        <span>Emisiones SO₂:</span>
-                        <span class="value" id="so2">0 kg/día</span>
-                    </div>
-                    <div class="data-row">
-                        <span>Intensidad de Carbono:</span>
-                        <span class="value" id="carbon-intensity">0 kg CO₂/MWh</span>
-                    </div>
-                    <div class="data-row">
-                        <span>Reducción vs. Carbón:</span>
-                        <span class="value positive" id="carbon-reduction">0 %</span>
-                    </div>
-                    <div class="result-card">
-    <h3>Comparación con Diésel</h3>
-    <div class="data-row">
-        <span>Costo con Diésel:</span>
-        <span class="value" id="costoDiesel">0 USD/día</span>
-    </div>
-    <div class="data-row">
-        <span>Ahorro Económico:</span>
-        <span class="value positive" id="ahorroDiesel">0 USD/día</span>
-    </div>
-    <div class="data-row">
-        <span>Ahorro Anual:</span>
-        <span class="value positive" id="ahorroDieselAnual">0 USD/año</span>
-    </div>
-    <div class="data-row">
-        <span>CO₂ Evitado Diésel:</span>
-        <span class="value positive" id="co2DieselEvitado">0 kg/día</span>
-    </div>
-    <div class="data-row">
-        <span>Reducción vs. Diésel:</span>
-        <span class="value positive" id="reduccionDiesel">0 %</span>
-    </div>
-</div>
+            <div class="result-card">
+                <h3>Análisis Económico</h3>
+                <div class="data-row">
+                    <span>Ingresos:</span>
+                    <span class="value" id="ingresos">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Costos:</span>
+                    <span class="value" id="costos">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Beneficio:</span>
+                    <span class="value" id="beneficio">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>ROI:</span>
+                    <span class="value" id="roi">0 %</span>
+                </div>
+                <div class="data-row">
+                    <span>Punto de Equilibrio:</span>
+                    <span class="value" id="breakeven">0 MWh/día</span>
+                </div>
+            </div>
+                
+            <div class="result-card">
+                <h3>Huella Ambiental</h3>
+                <div class="data-row">
+                    <span>Emisiones CO₂:</span>
+                    <span class="value" id="co2">0 kg/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Emisiones NOx:</span>
+                    <span class="value" id="nox">0 kg/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Emisiones SO₂:</span>
+                    <span class="value" id="so2">0 kg/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Intensidad de Carbono:</span>
+                    <span class="value" id="carbon-intensity">0 kg CO₂/MWh</span>
+                </div>
+                <div class="data-row">
+                    <span>Reducción vs. Carbón:</span>
+                    <span class="value positive" id="carbon-reduction">0 %</span>
+                </div>
+            </div>
+            
+            <div class="result-card">
+                <h3>Comparación con Diésel</h3>
+                <div class="data-row">
+                    <span>Costo con Diésel:</span>
+                    <span class="value" id="costoDiesel">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Ahorro Económico:</span>
+                    <span class="value positive" id="ahorroDiesel">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Ahorro Anual:</span>
+                    <span class="value positive" id="ahorroDieselAnual">0 USD/año</span>
+                </div>
+                <div class="data-row">
+                    <span>CO₂ Evitado Diésel:</span>
+                    <span class="value positive" id="co2DieselEvitado">0 kg/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Reducción vs. Diésel:</span>
+                    <span class="value positive" id="reduccionDiesel">0 %</span>
                 </div>
             </div>
             
@@ -232,9 +232,14 @@
                     <canvas id="emissionsChart"></canvas>
                 </div>
                 <div class="chart-container">
-    <h3>Comparación de Emisiones Gas vs. Diésel</h3>
-    <canvas id="emissionComparisonChart"></canvas>
-</div>
+                    <h3>
+                        Comparación de Emisiones Gas vs. Diésel
+                        <div class="chart-actions">
+                            <button class="btn-info" onclick="exportarGrafico('emissionComparisonChart')"><i class="fas fa-file-image"></i></button>
+                        </div>
+                    </h3>
+                    <canvas id="emissionComparisonChart"></canvas>
+                </div>
             </div>
         </div>
         
@@ -579,6 +584,8 @@
                             <span class="value positive" id="savings-coal">0 ton CO₂/año</span>
                         </div>
                         <div class="data-row">
+                            <span>Ahorro vs. Petróleo:</span>
+                            <span class="value positive" id="savings-oil">0<div class="data-row">
                             <span>Ahorro vs. Petróleo:</span>
                             <span class="value positive" id="savings-oil">0 ton CO₂/año</span>
                         </div>
