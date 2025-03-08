@@ -28,36 +28,6 @@ function exportarInforme() {
     // Añadir un encabezado para el informe
     const header = document.createElement('div');
     header.innerHTML = `
-        <div style="text-align: center; margin-// Mostrar opciones de informe personalizado
-function exportarInformePersonalizado() {
-    document.getElementById('opcionesPersonalizadas').style.display = 'block';
-}
-
-// Exportar a PDF el informe completo
-function exportarInforme() {
-    mostrarNotificacion("Generando PDF, por favor espere...");
-    
-    // Configuración para PDF
-    const options = {
-        margin: 10,
-        filename: 'Informe_Simulador_Gas_Asociado.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    
-    // Preparar contenido para PDF
-    const container = document.querySelector('.container');
-    
-    // Asegurarse de que todas las pestañas sean visibles para la exportación
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.add('active');
-        content.style.display = 'block';
-    });
-    
-    // Añadir un encabezado para el informe
-    const header = document.createElement('div');
-    header.innerHTML = `
         <div style="text-align: center; margin-bottom: 20px; padding: 10px; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">
             <h1 style="margin-bottom: 5px;">Informe Completo: Simulador de Generación Eléctrica con Gas Asociado</h1>
             <p style="margin-top: 0; color: #666;">Fecha: ${new Date().toLocaleDateString()}</p>
