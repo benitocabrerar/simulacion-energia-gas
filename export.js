@@ -7,6 +7,12 @@ function exportarInformePersonalizado() {
 function exportarInforme() {
     mostrarNotificacion("Generando PDF, por favor espere...");
     
+    // Comprobar si la librería html2pdf está disponible
+    if (typeof html2pdf !== 'function') {
+        mostrarNotificacion("Error: No se ha cargado la biblioteca html2pdf. Agregue la dependencia al proyecto.", "error");
+        return;
+    }
+    
     // Configuración para PDF
     const options = {
         margin: 10,
@@ -51,12 +57,32 @@ function exportarInforme() {
             
             mostrarNotificacion("PDF generado correctamente");
             cerrarModal('modalExportar');
+        })
+        .catch(err => {
+            mostrarNotificacion("Error al generar PDF: " + err.message, "error");
+            // Restaurar el estado original en caso de error
+            if (container.contains(header)) {
+                container.removeChild(header);
+            }
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = '';
+                content.classList.remove('active');
+            });
+            
+            // Activar solo la pestaña actual
+            document.querySelector('.tab.active').click();
         });
 }
 
 // Generar informe personalizado
 function generarInformePersonalizado() {
     mostrarNotificacion("Generando informe personalizado...");
+    
+    // Comprobar si la librería html2pdf está disponible
+    if (typeof html2pdf !== 'function') {
+        mostrarNotificacion("Error: No se ha cargado la biblioteca html2pdf. Agregue la dependencia al proyecto.", "error");
+        return;
+    }
     
     // Obtener secciones seleccionadas
     const seccionesSeleccionadas = Array.from(document.querySelectorAll('input[name="seccion"]:checked'))
@@ -94,8 +120,12 @@ function generarInformePersonalizado() {
     // Añadir las secciones seleccionadas
     seccionesSeleccionadas.forEach(seccion => {
         const seccionOriginal = document.getElementById(seccion);
-        tempContainer.innerHTML += `<h2>${obtenerNombreSeccion(seccion)}</h2>`;
-        tempContainer.innerHTML += seccionOriginal.innerHTML;
+        if (seccionOriginal) {
+            tempContainer.innerHTML += `<h2>${obtenerNombreSeccion(seccion)}</h2>`;
+            tempContainer.innerHTML += seccionOriginal.innerHTML;
+        } else {
+            console.error(`No se encontró la sección: ${seccion}`);
+        }
     });
     
     // Añadir temporalmente el contenedor al documento
@@ -108,6 +138,12 @@ function generarInformePersonalizado() {
             document.body.removeChild(tempContainer);
             mostrarNotificacion("PDF personalizado generado correctamente");
             cerrarModal('modalExportar');
+        })
+        .catch(err => {
+            mostrarNotificacion("Error al generar PDF personalizado: " + err.message, "error");
+            if (document.body.contains(tempContainer)) {
+                document.body.removeChild(tempContainer);
+            }
         });
 }
 
@@ -126,7 +162,18 @@ function obtenerNombreSeccion(id) {
 function exportarSeccion(seccionId) {
     mostrarNotificacion("Generando PDF de sección...");
     
+    // Comprobar si la librería html2pdf está disponible
+    if (typeof html2pdf !== 'function') {
+        mostrarNotificacion("Error: No se ha cargado la biblioteca html2pdf. Agregue la dependencia al proyecto.", "error");
+        return;
+    }
+    
     const seccion = document.getElementById(seccionId);
+    if (!seccion) {
+        mostrarNotificacion("Error: No se encontró la sección especificada.", "error");
+        return;
+    }
+    
     const nombreSeccion = obtenerNombreSeccion(seccionId);
     
     const options = {
@@ -163,11 +210,23 @@ function exportarSeccion(seccionId) {
         .then(() => {
             document.body.removeChild(tempContainer);
             mostrarNotificacion(`PDF de ${nombreSeccion} generado correctamente`);
+        })
+        .catch(err => {
+            mostrarNotificacion("Error al generar PDF de sección: " + err.message, "error");
+            if (document.body.contains(tempContainer)) {
+                document.body.removeChild(tempContainer);
+            }
         });
 }
 
 // Exportar todos los datos en formato CSV
 function exportarDatosCompletos() {
+    // Verificar que tengamos datos para exportar
+    if (!ultimosResultados || Object.keys(ultimosResultados).length === 0) {
+        mostrarNotificacion("No hay datos disponibles para exportar. Por favor, ejecute la simulación primero.", "error");
+        return;
+    }
+    
     // Crear contenido CSV con todos los datos
     let csvContent = "data:text/csv;charset=utf-8,";
     
@@ -214,6 +273,11 @@ function exportarDatosCompletos() {
 
 // Exportar parámetros en CSV
 function exportarParametros() {
+    if (!ultimosResultados || !ultimosResultados.parametros) {
+        mostrarNotificacion("No hay parámetros disponibles para exportar. Por favor, ejecute la simulación primero.", "error");
+        return;
+    }
+    
     let csvContent = "data:text/csv;charset=utf-8,";
     
     // Encabezados
@@ -236,6 +300,11 @@ function exportarParametros() {
 
 // Exportar datos financieros en CSV
 function exportarDatosFinancieros() {
+    if (!ultimosResultados || !ultimosResultados.economico) {
+        mostrarNotificacion("No hay datos financieros disponibles para exportar. Por favor, ejecute la simulación primero.", "error");
+        return;
+    }
+    
     let csvContent = "data:text/csv;charset=utf-8,";
     
     // Encabezados
@@ -258,6 +327,11 @@ function exportarDatosFinancieros() {
 
 // Exportar datos ambientales en CSV
 function exportarDatosAmbientales() {
+    if (!ultimosResultados || !ultimosResultados.ambiental) {
+        mostrarNotificacion("No hay datos ambientales disponibles para exportar. Por favor, ejecute la simulación primero.", "error");
+        return;
+    }
+    
     let csvContent = "data:text/csv;charset=utf-8,";
     
     // Encabezados
