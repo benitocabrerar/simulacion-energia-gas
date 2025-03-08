@@ -570,7 +570,93 @@
             </div>
         </div>
     </div>
+    // Script para asegurar la inicialización correcta de la aplicación
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si todos los elementos necesarios están presentes
+    const requiredElements = [
+        'pozos', 'gas', 'gor', 'sep', 'comp', 'turb', 'precio', 'costo',
+        'pozosValue', 'gasValue', 'gorValue', 'sepValue', 'compValue', 
+        'turbValue', 'precioValue', 'costoValue'
+    ];
     
+    let missingElements = [];
+    requiredElements.forEach(id => {
+        if (!document.getElementById(id)) {
+            missingElements.push(id);
+            console.error(`Elemento ${id} no encontrado en el DOM`);
+        }
+    });
+    
+    if (missingElements.length > 0) {
+        console.error('Faltan elementos necesarios:', missingElements);
+        alert('Error de inicialización: Faltan elementos necesarios en la página.');
+        return;
+    }
+    
+    // Configurar manejadores de eventos para las pestañas
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const targetId = this.getAttribute('onclick').match(/cambiarPestana\('([^']+)'\)/)[1];
+            cambiarPestana(targetId);
+        });
+    });
+    
+    // Inicializar valores de los sliders
+    document.getElementById('pozosValue').textContent = document.getElementById('pozos').value;
+    document.getElementById('gasValue').textContent = document.getElementById('gas').value;
+    document.getElementById('gorValue').textContent = document.getElementById('gor').value;
+    document.getElementById('sepValue').textContent = document.getElementById('sep').value;
+    document.getElementById('compValue').textContent = document.getElementById('comp').value;
+    document.getElementById('turbValue').textContent = document.getElementById('turb').value;
+    document.getElementById('precioValue').textContent = document.getElementById('precio').value;
+    document.getElementById('costoValue').textContent = document.getElementById('costo').value;
+    
+    // Inicializar datos y realizar cálculo inicial
+    window.ultimosDatosCalculados = {};
+    
+    // Inicializar configuraciones guardadas
+    window.configuracionesGuardadas = JSON.parse(localStorage.getItem('configuraciones') || '[]');
+    
+    // Llamar a calcular para inicializar los resultados
+    if (typeof calcular === 'function') {
+        calcular();
+    } else {
+        console.error('Error: Función calcular() no encontrada. Verificar que main.js está cargado correctamente.');
+        alert('Error: No se pueden realizar cálculos. Verifica la consola para más detalles.');
+    }
+    
+    console.log('Aplicación inicializada correctamente');
+});
+
+// Función auxiliar para verificar si los gráficos se están renderizando
+function verificarGraficos() {
+    const pestanaActiva = document.querySelector('.tab-content.active').id;
+    console.log('Pestaña activa:', pestanaActiva);
+    
+    const canvases = document.querySelectorAll(`#${pestanaActiva} canvas`);
+    console.log(`Encontrados ${canvases.length} elementos canvas en la pestaña ${pestanaActiva}`);
+    
+    if (canvases.length === 0) {
+        console.warn('No se encontraron canvas para los gráficos en la pestaña activa');
+    }
+}
+
+// Función para corregir problemas con Chart.js
+function corregirChartJs() {
+    if (typeof Chart !== 'function') {
+        console.error('Error: Chart.js no está disponible. Verificar que la biblioteca está cargada correctamente.');
+        alert('Error: No se pueden mostrar gráficos. Verifica la consola para más detalles.');
+        return;
+    }
+    
+    // Configuración global de Chart.js
+    Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    Chart.defaults.font.size = 12;
+    Chart.defaults.color = '#333';
+    
+    console.log('Chart.js configurado correctamente');
+}
     <script src="main.js"></script>
     <script src="charts.js"></script>
     <script src="config.js"></script>
