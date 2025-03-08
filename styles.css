@@ -16,6 +16,7 @@ body {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     border-radius: 0;
     padding: 0;
+    padding-bottom: 20px; /* Ajustado para acomodar el footer */
 }
 .header {
     padding: 15px 20px;
@@ -61,6 +62,7 @@ h1 {
 .tab-content {
     display: none;
     padding: 20px;
+    padding-bottom: 60px; /* Aumentar el padding inferior */
 }
 .tab-content.active {
     display: block;
@@ -69,7 +71,7 @@ h1 {
     background-color: white;
     border-radius: 4px;
     padding: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 30px; /* Aumentar el margen inferior */
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     border: 1px solid #eeeeee;
 }
@@ -206,6 +208,7 @@ button:active {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     margin-top: 20px;
+    margin-bottom: 40px; /* Aumentar el margen inferior */
 }
 .chart-container {
     background-color: white;
@@ -214,6 +217,7 @@ button:active {
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     border: 1px solid #eee;
     height: 300px;
+    margin-bottom: 20px; /* Agregar margen inferior a cada gráfico */
 }
 .chart-container h3 {
     margin-top: 0;
@@ -279,7 +283,7 @@ canvas {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 40px; /* Aumentar el margen inferior */
 }
 .metric-card {
     background-color: white;
@@ -304,7 +308,7 @@ canvas {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 40px; /* Aumentar el margen inferior */
 }
 .eco-metric {
     background-color: white;
@@ -413,6 +417,40 @@ canvas {
     transform: translateY(0);
 }
 
+/* Estilo para el espaciador */
+.spacer {
+    height: 60px;
+    width: 100%;
+    clear: both;
+}
+
+/* Estilos para el pie de página */
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+    margin-top: 40px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.footer .title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+.footer .author {
+    margin-bottom: 5px;
+}
+
+.footer .copyright {
+    font-size: 0.8rem;
+    color: #777;
+}
+
 /* Media queries */
 @media (max-width: 768px) {
     .grid-3, .charts-grid {
@@ -436,6 +474,21 @@ canvas {
     }
     .export-options {
         margin-top: 10px;
+    }
+    .charts-grid {
+        margin-bottom: 60px; /* Más espacio en móviles */
+    }
+    
+    .panel {
+        margin-bottom: 40px; /* Más espacio en móviles */
+    }
+    
+    .spacer {
+        height: 80px; /* Mayor espacio en móviles */
+    }
+    
+    .footer {
+        padding: 15px 10px;
     }
 }
 
