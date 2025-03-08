@@ -83,6 +83,7 @@ function resetearParametros() {
     document.getElementById('precio').value = 80;  // Ajustado a un valor más realista (USD/MWh)
     document.getElementById('costo').value = 15;
     document.getElementById('pc').value = 1400;    // Valor predeterminado para poder calorífico
+    document.getElementById('costeDiesel').value = 0.31; // Valor predeterminado para el costo del diésel
     
     // Actualizar los valores mostrados
     document.getElementById('pozosValue').textContent = 5;
@@ -94,6 +95,7 @@ function resetearParametros() {
     document.getElementById('precioValue').textContent = 80;  // Actualizado
     document.getElementById('costoValue').textContent = 15;
     document.getElementById('pcValue').textContent = 1400;    // Actualizado
+    document.getElementById('costeDieselValue').textContent = 0.31; // Actualizado
     
     flujoCalculado = false;
     calcular();
@@ -238,6 +240,24 @@ function calcular() {
     const emisionsAhorradasVenting = gasExtraido * 1000 * 0.0028 * 25 * factorAjuste * 365 * KG_A_TON - emisionesAnualesCO2; // CH4 tiene 25 veces más GWP
     const equivalenteArboles = emisionsAhorradasFlaring * 42; // 1 ton CO2 = ~42 árboles/año
     
+    // Cálculos de comparación con diésel
+    const costeDiesel = parseFloat(document.getElementById('costeDiesel').value); // USD/kWh
+    
+    // Cálculos de comparación con diésel
+    const costoDieselDiario = energiaEntregadaKWh * costeDiesel; // USD/día
+    const ahorroDieselDiario = costoDieselDiario - ingresos; // USD/día (ahorro al usar gas en lugar de diésel)
+    const ahorroDieselAnual = ahorroDieselDiario * 365; // USD/año
+    
+    // Factores de emisión para generación con diésel
+    // CO2: ~0.7 kg/kWh, NOx: ~0.0025 kg/kWh, SO2: ~0.0015 kg/kWh
+    const emisionesCO2Diesel = energiaEntregadaKWh * 0.7; // kg CO2/día
+    const emisionesNOxDiesel = energiaEntregadaKWh * 0.0025; // kg NOx/día
+    const emisionesSO2Diesel = energiaEntregadaKWh * 0.0015; // kg SO2/día
+    
+    // Reducción de emisiones al usar gas en lugar de diésel
+    const co2DieselEvitado = emisionesCO2Diesel - emisionesCO2; // kg CO2/día
+    const reduccionDiesel = (co2DieselEvitado / emisionesCO2Diesel) * 100; // Porcentaje
+    
     // Guardar resultados para exportación
     ultimosResultados = {
         parametros: {
@@ -298,6 +318,16 @@ function calcular() {
             emisionsAhorradasOil,
             emisionsAhorradasVenting,
             equivalenteArboles
+        },
+        comparacionDiesel: {
+            costoDieselDiario,
+            ahorroDieselDiario,
+            ahorroDieselAnual,
+            emisionesCO2Diesel,
+            emisionesNOxDiesel,
+            emisionesSO2Diesel,
+            co2DieselEvitado,
+            reduccionDiesel
         }
     };
     
@@ -324,6 +354,13 @@ function calcular() {
     document.getElementById('so2').textContent = convertirEmisiones(emisionesSO2);
     document.getElementById('carbon-intensity').textContent = intensidadCarbono.toFixed(1) + " kg CO₂/MWh";
     document.getElementById('carbon-reduction').textContent = reduccionVsCarbon.toFixed(1) + " %";
+    
+    // Actualizar sección de comparación con diésel
+    document.getElementById('costoDiesel').textContent = costoDieselDiario.toFixed(2) + " USD/día";
+    document.getElementById('ahorroDiesel').textContent = ahorroDieselDiario.toFixed(2) + " USD/día";
+    document.getElementById('ahorroDieselAnual').textContent = ahorroDieselAnual.toFixed(0) + " USD/año";
+    document.getElementById('co2DieselEvitado').textContent = co2DieselEvitado.toFixed(1) + " kg/día";
+    document.getElementById('reduccionDiesel').textContent = reduccionDiesel.toFixed(1) + " %";
     
     // Pestaña de Proceso
     document.getElementById('flowPozo').textContent = convertirGas(gasExtraido);
@@ -399,6 +436,9 @@ function calcular() {
         emisionesNOx, 
         emisionesSO2,
         emisionesCH4,
+        emisionesCO2Diesel,
+        emisionesNOxDiesel,
+        emisionesSO2Diesel,
         costoCombustible,
         costoMantenimiento,
         costoPersonal,
