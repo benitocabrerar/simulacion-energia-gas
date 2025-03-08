@@ -376,6 +376,7 @@
         
         <!-- Análisis Financiero -->
         <div id="financiero" class="tab-content">
+            <!-- Contenido del análisis financiero -->
             <div class="panel">
                 <h2>
                     Análisis Financiero Detallado
@@ -386,6 +387,7 @@
                 </h2>
                 
                 <div class="financial-metrics">
+                    <!-- Métricas financieras -->
                     <div class="metric-card">
                         <div class="label">Ingresos Anuales</div>
                         <div class="value" id="ingresosAnuales">$0</div>
@@ -412,6 +414,7 @@
                 </div>
                 
                 <div class="charts-grid">
+                    <!-- Gráficos financieros -->
                     <div class="chart-container">
                         <h3>
                             Desglose de Costos
@@ -434,6 +437,7 @@
                 </div>
                 
                 <div class="grid-3">
+                    <!-- Métricas adicionales -->
                     <div class="result-card">
                         <h3>Análisis de Inversión</h3>
                         <div class="data-row">
@@ -499,6 +503,7 @@
         
         <!-- Huella Ambiental -->
         <div id="ambiental" class="tab-content">
+            <!-- Contenido de la pestaña ambiental -->
             <div class="panel">
                 <h2>
                     Análisis de Huella Ambiental
@@ -509,6 +514,7 @@
                 </h2>
                 
                 <div class="environmental-metrics">
+                    <!-- Métricas ambientales -->
                     <div class="eco-metric">
                         <div class="label">Emisiones Anuales CO₂</div>
                         <div class="value" id="co2-annual">0</div>
@@ -535,6 +541,7 @@
                 </div>
                 
                 <div class="charts-grid">
+                    <!-- Gráficos ambientales -->
                     <div class="chart-container">
                         <h3>
                             Comparación de Intensidad de Carbono
@@ -557,6 +564,7 @@
                 </div>
                 
                 <div class="grid-3">
+                    <!-- Información detallada ambiental -->
                     <div class="result-card">
                         <h3>Desglose de Emisiones</h3>
                         <div class="data-row">
@@ -584,21 +592,377 @@
                             <span class="value positive" id="savings-coal">0 ton CO₂/año</span>
                         </div>
                         <div class="data-row">
-                            <span>Ahorro vs. Petróleo:</span>
-                            <span class="value positive" id="savings-oil">0<div class="data-row">
-                            <span>Ahorro vs. Petróleo:</span>
-                            <span class="value positive" id="savings-oil">0 ton CO₂/año</span>
+                            <span>Ahorro vs. Petróleo:</span><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Generación Eléctrica con Gas Asociado</title>
+    <!-- Estilos y librerías externas -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Librerías JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container" id="main-container">
+        <div class="header">
+            <h1>Simulador de Generación Eléctrica con Gas Asociado</h1>
+            <div class="export-options">
+                <button class="btn-info" onclick="mostrarModalExportar()"><i class="fas fa-file-export"></i> Exportar Resultados</button>
+                <button class="btn-dark" onclick="mostrarModalConfiguracion()"><i class="fas fa-save"></i> Guardar/Cargar Configuración</button>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="cambiarPestana('panel-principal')">Panel Principal</div>
+            <div class="tab" onclick="cambiarPestana('proceso')">Flujo del Proceso</div>
+            <div class="tab" onclick="cambiarPestana('financiero')">Análisis Financiero</div>
+            <div class="tab" onclick="cambiarPestana('ambiental')">Huella Ambiental</div>
+        </div>
+        
+        <!-- Panel Principal -->
+        <div id="panel-principal" class="tab-content active">
+            <div class="panel">
+                <h2>
+                    Parámetros de la Simulación
+                    <div class="panel-actions">
+                        <button class="btn-info" onclick="exportarParametros()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+                    </div>
+                </h2>
+                <div class="controls-grid">
+                    <div class="control-item">
+                        <label>Pozos Activos: <span id="pozosValue">5</span></label>
+                        <input type="range" min="1" max="20" value="5" id="pozos" oninput="actualizarValor('pozos')">
+                    </div>
+                    <div class="control-item">
+                        <label>Gas Disponible (miles m³/día): <span id="gasValue">100</span></label>
+                        <input type="range" min="10" max="500" step="10" value="100" id="gas" oninput="actualizarValor('gas')">
+                    </div>
+                    <div class="control-item">
+                        <label>GOR (pies³/bbl): <span id="gorValue">1000</span></label>
+                        <input type="range" min="500" max="5000" step="100" value="1000" id="gor" oninput="actualizarValor('gor')">
+                    </div>
+                    <div class="control-item">
+                        <label>Eficiencia Separación (%): <span id="sepValue">85</span></label>
+                        <input type="range" min="60" max="98" value="85" id="sep" oninput="actualizarValor('sep')">
+                    </div>
+                    <div class="control-item">
+                        <label>Eficiencia Compresión (%): <span id="compValue">90</span></label>
+                        <input type="range" min="70" max="98" value="90" id="comp" oninput="actualizarValor('comp')">
+                    </div>
+                    <div class="control-item">
+                        <label>Eficiencia Turbina (%): <span id="turbValue">38</span></label>
+                        <input type="range" min="25" max="45" value="38" id="turb" oninput="actualizarValor('turb')">
+                    </div>
+                    <div class="control-item">
+                        <label>Precio Electricidad (USD/MWh): <span id="precioValue">75</span></label>
+                        <input type="range" min="30" max="150" value="75" id="precio" oninput="actualizarValor('precio')">
+                    </div>
+                    <div class="control-item">
+                        <label>Costo Operativo (USD/MWh): <span id="costoValue">15</span></label>
+                        <input type="range" min="5" max="40" value="15" id="costo" oninput="actualizarValor('costo')">
+                    </div>
+                    <div class="control-item">
+                        <label>Poder Calorífico (BTU/SCF): <span id="pcValue">1400</span></label>
+                        <input type="range" min="900" max="1800" step="50" value="1400" id="pc" oninput="actualizarValor('pc')">
+                    </div>
+                    <div class="control-item">
+                        <label>Costo Electricidad Diésel (USD/kWh): <span id="costeDieselValue">0.31</span></label>
+                        <input type="range" min="0.20" max="0.50" step="0.01" value="0.31" id="costeDiesel" oninput="actualizarValor('costeDiesel')">
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-primary" onclick="calcular()"><i class="fas fa-calculator"></i> Calcular Resultados</button>
+                    <button class="btn-secondary" onclick="toggleUnidades()"><i class="fas fa-exchange-alt"></i> <span id="btn-unidades">Usar Unidades Imperiales</span></button>
+                    <button class="btn-tertiary" onclick="resetearParametros()"><i class="fas fa-undo"></i> Restablecer Valores</button>
+                </div>
+            </div>
+            
+            <div class="result-card">
+                <h3>Producción de Gas</h3>
+                <div class="data-row">
+                    <span>Gas Extraído:</span>
+                    <span class="value" id="gasExtraido">0 miles m³/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Gas Procesado:</span>
+                    <span class="value" id="gasComprimido">0 miles m³/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Petróleo Asociado:</span>
+                    <span class="value" id="petroDiario">0 bbl/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Energía Generada:</span>
+                    <span class="value" id="energiaGenerada">0 MWh/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Energía Entregada:</span>
+                    <span class="value" id="energiaEntregada">0 MWh/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Capacidad Instalada:</span>
+                    <span class="value" id="capacidadInstalada">0 kW</span>
+                </div>
+                <div class="data-row">
+                    <span>Poder Calorífico:</span>
+                    <span class="value" id="poderCalorifico">0 kcal/m³</span>
+                </div>
+            </div>
+                
+            <div class="result-card">
+                <h3>Análisis Económico</h3>
+                <div class="data-row">
+                    <span>Ingresos:</span>
+                    <span class="value" id="ingresos">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Costos:</span>
+                    <span class="value" id="costos">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Beneficio:</span>
+                    <span class="value" id="beneficio">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>ROI:</span>
+                    <span class="value" id="roi">0 %</span>
+                </div>
+                <div class="data-row">
+                    <span>Punto de Equilibrio:</span>
+                    <span class="value" id="breakeven">0 MWh/día</span>
+                </div>
+            </div>
+                
+            <div class="result-card">
+                <h3>Huella Ambiental</h3>
+                <div class="data-row">
+                    <span>Emisiones CO₂:</span>
+                    <span class="value" id="co2">0 kg/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Emisiones NOx:</span>
+                    <span class="value" id="nox">0 kg/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Emisiones SO₂:</span>
+                    <span class="value" id="so2">0 kg/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Intensidad de Carbono:</span>
+                    <span class="value" id="carbon-intensity">0 kg CO₂/MWh</span>
+                </div>
+                <div class="data-row">
+                    <span>Reducción vs. Carbón:</span>
+                    <span class="value positive" id="carbon-reduction">0 %</span>
+                </div>
+            </div>
+            
+            <div class="result-card">
+                <h3>Comparación con Diésel</h3>
+                <div class="data-row">
+                    <span>Costo con Diésel:</span>
+                    <span class="value" id="costoDiesel">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Ahorro Económico:</span>
+                    <span class="value positive" id="ahorroDiesel">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Ahorro Anual:</span>
+                    <span class="value positive" id="ahorroDieselAnual">0 USD/año</span>
+                </div>
+                <div class="data-row">
+                    <span>CO₂ Evitado Diésel:</span>
+                    <span class="value positive" id="co2DieselEvitado">0 kg/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Reducción vs. Diésel:</span>
+                    <span class="value positive" id="reduccionDiesel">0 %</span>
+                </div>
+            </div>
+            
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>
+                        Producción de Petróleo y Gas
+                        <div class="chart-actions">
+                            <button class="btn-info" onclick="exportarGrafico('productionChart')"><i class="fas fa-file-image"></i></button>
+                        </div>
+                    </h3>
+                    <canvas id="productionChart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>
+                        Generación de Energía
+                        <div class="chart-actions">
+                            <button class="btn-info" onclick="exportarGrafico('energyChart')"><i class="fas fa-file-image"></i></button>
+                        </div>
+                    </h3>
+                    <canvas id="energyChart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>
+                        Ingresos vs. Costos
+                        <div class="chart-actions">
+                            <button class="btn-info" onclick="exportarGrafico('financialChart')"><i class="fas fa-file-image"></i></button>
+                        </div>
+                    </h3>
+                    <canvas id="financialChart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>
+                        Emisiones
+                        <div class="chart-actions">
+                            <button class="btn-info" onclick="exportarGrafico('emissionsChart')"><i class="fas fa-file-image"></i></button>
+                        </div>
+                    </h3>
+                    <canvas id="emissionsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>
+                        Comparación de Emisiones Gas vs. Diésel
+                        <div class="chart-actions">
+                            <button class="btn-info" onclick="exportarGrafico('emissionComparisonChart')"><i class="fas fa-file-image"></i></button>
+                        </div>
+                    </h3>
+                    <canvas id="emissionComparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Flujo del Proceso -->
+        <div id="proceso" class="tab-content">
+            <div class="panel">
+                <h2>
+                    Esquema del Proceso
+                    <div class="panel-actions">
+                        <button class="btn-info" onclick="exportarSeccion('proceso')"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+                    </div>
+                </h2>
+                <div class="process-flow">
+                    <div class="process-step" style="background-color: rgba(52, 152, 219, 0.1);">
+                        <h4>Pozo</h4>
+                        <p id="flowPozo">0 miles m³/día</p>
+                        <small>Extracción de gas asociado</small>
+                    </div>
+                    <div class="arrow">→</div>
+                    
+                    <div class="process-step" style="background-color: rgba(46, 204, 113, 0.1);">
+                        <h4>Separador</h4>
+                        <p id="flowSeparador">0 miles m³/día</p>
+                        <small id="flowSepEf">Ef: 85%</small>
+                    </div>
+                    <div class="arrow">→</div>
+                    
+                    <div class="process-step" style="background-color: rgba(155, 89, 182, 0.1);">
+                        <h4>Compresión</h4>
+                        <p id="flowCompresion">0 miles m³/día</p>
+                        <small id="flowCompEf">Ef: 90%</small>
+                    </div>
+                    <div class="arrow">→</div>
+                    
+                    <div class="process-step" style="background-color: rgba(231, 76, 60, 0.1);">
+                        <h4>Turbina</h4>
+                        <p id="flowTurbina">0 MWh/día</p>
+                        <small id="flowTurbEf">Ef: 38%</small>
+                    </div>
+                    <div class="arrow">→</div>
+                    
+                    <div class="process-step" style="background-color: rgba(46, 204, 113, 0.1);">
+                        <h4>Red Eléctrica</h4>
+                        <p id="flowRed">0 MWh/día</p>
+                        <small>Pérdidas: 5%</small>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>
+                            Flujo del Proceso
+                            <div class="chart-actions">
+                                <button class="btn-info" onclick="exportarGrafico('flowChart')"><i class="fas fa-file-image"></i></button>
+                            </div>
+                        </h3>
+                        <canvas id="flowChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>
+                            Eficiencia del Sistema
+                            <div class="chart-actions">
+                                <button class="btn-info" onclick="exportarGrafico('efficiencyChart')"><i class="fas fa-file-image"></i></button>
+                            </div>
+                        </h3>
+                        <canvas id="efficiencyChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="grid-3">
+                    <div class="result-card">
+                        <h3>Residuos y Emisiones</h3>
+                        <div class="data-row">
+                            <span>CO₂:</span>
+                            <span class="value" id="co2-flow">0 kg/día</span>
                         </div>
                         <div class="data-row">
-                            <span>Ahorro vs. Flaring:</span>
-                            <span class="value positive" id="savings-flaring">0 ton CO₂/año</span>
+                            <span>NOx:</span>
+                            <span class="value" id="nox-flow">0 kg/día</span>
                         </div>
                         <div class="data-row">
-                            <span>Ahorro vs. Venteo:</span>
-                            <span class="value positive" id="savings-venting">0 ton CO₂/año</span>
+                            <span>SO₂:</span>
+                            <span class="value" id="so2-flow">0 kg/día</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Gas no utilizado:</span>
+                            <span class="value" id="gasNoUtil">0 miles m³/día</span>
                         </div>
                     </div>
                     
+                    <div class="result-card">
+                        <h3>Características del Gas</h3>
+                        <div class="data-row">
+                            <span>Poder Calorífico:</span>
+                            <span class="value">9,400 kcal/m³</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Composición Típica:</span>
+                            <span class="value">CH₄ (85%), C₂H₆ (9%), CO₂ (4%)</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Densidad:</span>
+                            <span class="value">0.8 kg/m³</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Temperatura Combustión:</span>
+                            <span class="value">1,950°C</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3>Rendimiento del Sistema</h3>
+                        <div class="data-row">
+                            <span>Eficiencia Térmica:</span>
+                            <span class="value" id="eficiencia-termica">0 %</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Rendimiento Eléctrico:</span>
+                            <span class="value" id="rendimiento-electrico">0 %</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Factor de Planta:</span>
+                            <span class="value" id="factor-planta">0 %</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Disponibilidad:</span>
+                            <span class="value">95 %</span>
+                        </div>
                     <div class="result-card">
                         <h3>Impacto Ambiental y Cumplimiento</h3>
                         <div class="data-row">
@@ -686,25 +1050,234 @@
         <div id="notificacion" class="notification">
             Operación completada con éxito
         </div>
-    </div>
-<script>
-    // Añadir esto justo antes de cargar los scripts
-    console.log('Preparando carga de scripts');
-    
-    function verificarScript(scriptName) {
-        console.log(scriptName + ' cargado correctamente');
-    }
-</script>
-
-<!-- Scripts JavaScript con verificación -->
-<script src="main.js" onload="verificarScript('main.js')" onerror="console.error('Error cargando main.js')"></script>
-<script src="charts.js" onload="verificarScript('charts.js')" onerror="console.error('Error cargando charts.js')"></script>
-<script src="export.js" onload="verificarScript('export.js')" onerror="console.error('Error cargando export.js')"></script>
-<script src="config.js" onload="verificarScript('config.js')" onerror="console.error('Error cargando config.js')"></script>
-    <!-- Scripts JavaScript -->
-    <script src="main.js"></script>
-    <script src="charts.js"></script>
-    <script src="export.js"></script>
-    <script src="config.js"></script>
-</body>
-</html>
+        
+        <!-- Análisis Financiero -->
+        <div id="financiero" class="tab-content">
+            <!-- Contenido del análisis financiero -->
+            <div class="panel">
+                <h2>
+                    Análisis Financiero Detallado
+                    <div class="panel-actions">
+                        <button class="btn-info" onclick="exportarSeccion('financiero')"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+                        <button class="btn-info" onclick="exportarDatosFinancieros()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+                    </div>
+                </h2>
+                
+                <div class="financial-metrics">
+                    <!-- Métricas financieras -->
+                    <div class="metric-card">
+                        <div class="label">Ingresos Anuales</div>
+                        <div class="value" id="ingresosAnuales">$0</div>
+                        <div class="label">USD/año</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="label">Costos Anuales</div>
+                        <div class="value" id="costosAnuales">$0</div>
+                        <div class="label">USD/año</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="label">Beneficio Anual</div>
+                        <div class="value" id="beneficioAnual">$0</div>
+                        <div class="label">USD/año</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="label">ROI</div>
+                        <div class="value" id="roiAnual">0%</div>
+                        <div class="label">Retorno sobre inversión</div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <!-- Gráficos financieros -->
+                    <div class="chart-container">
+                        <h3>
+                            Desglose de Costos
+                            <div class="chart-actions">
+                                <button class="btn-info" onclick="exportarGrafico('costBreakdownChart')"><i class="fas fa-file-image"></i></button>
+                            </div>
+                        </h3>
+                        <canvas id="costBreakdownChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>
+                            Proyección de Flujo de Caja (5 años)
+                            <div class="chart-actions">
+                                <button class="btn-info" onclick="exportarGrafico('cashFlowChart')"><i class="fas fa-file-image"></i></button>
+                            </div>
+                        </h3>
+                        <canvas id="cashFlowChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="grid-3">
+                    <!-- Métricas adicionales -->
+                    <div class="result-card">
+                        <h3>Análisis de Inversión</h3>
+                        <div class="data-row">
+                            <span>Inversión Inicial Estimada:</span>
+                            <span class="value" id="inversion-inicial">$0 USD</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Valor Actual Neto (VAN):</span>
+                            <span class="value" id="van">$0 USD</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Tasa Interna de Retorno (TIR):</span>
+                            <span class="value" id="tir">0%</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Tiempo de Recuperación:</span>
+                            <span class="value" id="payback">0 años</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3>Costos de Operación</h3>
+                        <div class="data-row">
+                            <span>Costo de Combustible:</span>
+                            <span class="value" id="costo-combustible">$0 USD/día</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Costo de Mantenimiento:</span>
+                            <span class="value" id="costo-mantenimiento">$0 USD/día</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Costos de Personal:</span>
+                            <span class="value" id="costo-personal">$0 USD/día</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Otros Costos:</span>
+                            <span class="value" id="otros-costos">$0 USD/día</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3>Métricas Financieras</h3>
+                        <div class="data-row">
+                            <span>LCOE (Costo Nivelado de Energía):</span>
+                            <span class="value" id="lcoe">0 USD/MWh</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Margen Operativo:</span>
+                            <span class="value" id="margen-operativo">0%</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Precio de Equilibrio:</span>
+                            <span class="value" id="precio-equilibrio">0 USD/MWh</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Relación Beneficio-Costo:</span>
+                            <span class="value" id="relacion-bc">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Huella Ambiental -->
+        <div id="ambiental" class="tab-content">
+            <!-- Contenido de la pestaña ambiental -->
+            <div class="panel">
+                <h2>
+                    Análisis de Huella Ambiental
+                    <div class="panel-actions">
+                        <button class="btn-info" onclick="exportarSeccion('ambiental')"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+                        <button class="btn-info" onclick="exportarDatosAmbientales()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+                    </div>
+                </h2>
+                
+                <div class="environmental-metrics">
+                    <!-- Métricas ambientales -->
+                    <div class="eco-metric">
+                        <div class="label">Emisiones Anuales CO₂</div>
+                        <div class="value" id="co2-annual">0</div>
+                        <div class="label">toneladas/año</div>
+                    </div>
+                    
+                    <div class="eco-metric">
+                        <div class="label">Emisiones evitadas vs Flaring</div>
+                        <div class="value positive" id="emissions-saved">0</div>
+                        <div class="label">toneladas CO₂/año</div>
+                    </div>
+                    
+                    <div class="eco-metric">
+                        <div class="label">Intensidad de Carbono</div>
+                        <div class="value" id="carbon-intensity-full">0</div>
+                        <div class="label">kg CO₂/MWh</div>
+                    </div>
+                    
+                    <div class="eco-metric">
+                        <div class="label">Equivalente en Árboles</div>
+                        <div class="value" id="tree-equivalent">0</div>
+                        <div class="label">árboles/año</div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <!-- Gráficos ambientales -->
+                    <div class="chart-container">
+                        <h3>
+                            Comparación de Intensidad de Carbono
+                            <div class="chart-actions">
+                                <button class="btn-info" onclick="exportarGrafico('carbonComparisonChart')"><i class="fas fa-file-image"></i></button>
+                            </div>
+                        </h3>
+                        <canvas id="carbonComparisonChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>
+                            Composición de Emisiones
+                            <div class="chart-actions">
+                                <button class="btn-info" onclick="exportarGrafico('emissionsCompositionChart')"><i class="fas fa-file-image"></i></button>
+                            </div>
+                        </h3>
+                        <canvas id="emissionsCompositionChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="grid-3">
+                    <!-- Información detallada ambiental -->
+                    <div class="result-card">
+                        <h3>Desglose de Emisiones</h3>
+                        <div class="data-row">
+                            <span>CO₂:</span>
+                            <span class="value" id="co2-detail">0 kg/día</span>
+                        </div>
+                        <div class="data-row">
+                            <span>NOx:</span>
+                            <span class="value" id="nox-detail">0 kg/día</span>
+                        </div>
+                        <div class="data-row">
+                            <span>SO₂:</span>
+                            <span class="value" id="so2-detail">0 kg/día</span>
+                        </div>
+                        <div class="data-row">
+                            <span>CH₄ (Metano):</span>
+                            <span class="value" id="ch4-detail">0 kg/día</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3>Ahorro vs. Alternativas</h3>
+                        <div class="data-row">
+                            <span>Ahorro vs. Carbón:</span>
+                            <span class="value positive" id="savings-coal">0 ton CO₂/año</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Ahorro vs. Petróleo:</span>
+                            <span class="value positive" id="savings-oil">0 ton CO₂/año</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Ahorro vs. Flaring:</span>
+                            <span class="value positive" id="savings-flaring">0 ton CO₂/año</span>
+                        </div>
+                        <div class="data-row">
+                            <span>Ahorro vs. Venteo:</span>
+                            <span class="value positive" id="savings-venting">0 ton CO₂/año</span>
+                        </div>
+                    </div>
