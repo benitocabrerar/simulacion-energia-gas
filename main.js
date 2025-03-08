@@ -321,3 +321,143 @@ function calcular() {
         intensidadCarbono: intensidadCarbono,
         capacidadInstalada: capacidadInstalada
     };
+    
+    // Actualizar interfaz con resultados
+    actualizarInterfazConResultados();
+    
+    // Actualizar gráficos
+    actualizarGraficos({
+        gasExtraido, 
+        gasSeparado,
+        gasComprimido, 
+        gasNoUtilizado,
+        produccionPetroleoDiaria, 
+        energiaTermica, 
+        energiaElectrica, 
+        perdidas, 
+        energiaEntregada, 
+        ingresos, 
+        gastos, 
+        beneficio, 
+        emisionesCO2, 
+        emisionesNOx, 
+        emisionesSO2,
+        emisionesCH4,
+        costoCombustible,
+        costoMantenimiento,
+        costoPersonal,
+        otrosCostos,
+        intensidadCarbono,
+        capacidadInstalada
+    });
+}
+
+// Función para actualizar solo la interfaz con los resultados
+function actualizarInterfazConResultados() {
+    if (!window.ultimosDatosCalculados) return;
+    
+    const { gasExtraido, gasComprimido, gasNoUtilizado, produccionPetroleoDiaria, 
+            energiaElectrica, energiaEntregada, ingresos, gastos, beneficio, retornoInversion,
+            emisionesCO2, emisionesNOx, emisionesSO2, intensidadCarbono, 
+            reduccionVsCarbon, capacidadInstalada } = window.ultimosDatosCalculados;
+    
+    // Panel Principal
+    document.getElementById('gasExtraido').textContent = convertirGas(gasExtraido);
+    document.getElementById('gasComprimido').textContent = convertirGas(gasComprimido);
+    document.getElementById('petroDiario').textContent = produccionPetroleoDiaria.toFixed(0) + " bbl/día";
+    document.getElementById('energiaGenerada').textContent = energiaElectrica.toFixed(2) + " MWh/día";
+    document.getElementById('energiaEntregada').textContent = energiaEntregada.toFixed(2) + " MWh/día";
+    document.getElementById('capacidadInstalada').textContent = capacidadInstalada.toFixed(0) + " kW";
+    
+    document.getElementById('ingresos').textContent = ingresos.toFixed(2) + " USD/día";
+    document.getElementById('costos').textContent = gastos.toFixed(2) + " USD/día";
+    document.getElementById('beneficio').textContent = beneficio.toFixed(2) + " USD/día";
+    document.getElementById('beneficio').className = beneficio > 0 ? "value positive" : "value negative";
+    document.getElementById('roi').textContent = retornoInversion.toFixed(1) + " %";
+    document.getElementById('roi').className = retornoInversion > 0 ? "value positive" : "value negative";
+    if (document.getElementById('breakeven')) {
+        document.getElementById('breakeven').textContent = (ultimosResultados.economico.breakeven).toFixed(2) + " MWh/día";
+    }
+    
+    document.getElementById('co2').textContent = convertirEmisiones(emisionesCO2);
+    document.getElementById('nox').textContent = convertirEmisiones(emisionesNOx);
+    document.getElementById('so2').textContent = convertirEmisiones(emisionesSO2);
+    document.getElementById('carbon-intensity').textContent = intensidadCarbono.toFixed(1) + " kg CO₂/MWh";
+    document.getElementById('carbon-reduction').textContent = reduccionVsCarbon.toFixed(1) + " %";
+    
+    // Actualizar pestaña de proceso
+    if (document.getElementById('flowPozo')) {
+        document.getElementById('flowPozo').textContent = convertirGas(gasExtraido);
+        document.getElementById('flowSeparador').textContent = convertirGas(window.ultimosDatosCalculados.gasSeparado);
+        document.getElementById('flowCompresion').textContent = convertirGas(gasComprimido);
+        document.getElementById('flowTurbina').textContent = energiaElectrica.toFixed(1) + " MWh/día";
+        document.getElementById('flowRed').textContent = energiaEntregada.toFixed(1) + " MWh/día";
+        
+        document.getElementById('co2-flow').textContent = convertirEmisiones(emisionesCO2);
+        document.getElementById('nox-flow').textContent = convertirEmisiones(emisionesNOx);
+        document.getElementById('so2-flow').textContent = convertirEmisiones(emisionesSO2);
+        document.getElementById('gasNoUtil').textContent = convertirGas(gasNoUtilizado);
+    }
+    
+    // Actualizar otras secciones según sea necesario
+}
+
+// Mostrar notificación
+function mostrarNotificacion(mensaje, tipo = 'success') {
+    const notificacion = document.getElementById('notificacion');
+    
+    // Establecer el color según el tipo
+    if (tipo === 'error') {
+        notificacion.style.backgroundColor = '#e74c3c';
+    } else {
+        notificacion.style.backgroundColor = '#2ecc71';
+    }
+    
+    notificacion.textContent = mensaje;
+    notificacion.classList.add('show');
+    
+    // Ocultar después de 3 segundos
+    setTimeout(() => {
+        notificacion.classList.remove('show');
+    }, 3000);
+}
+
+// Mostrar modal de exportación
+function mostrarModalExportar() {
+    document.getElementById('modalExportar').style.display = 'block';
+}
+
+// Mostrar modal de configuración
+function mostrarModalConfiguracion() {
+    document.getElementById('modalConfiguracion').style.display = 'block';
+    actualizarListaConfiguraciones();
+}
+
+// Cerrar modal
+function cerrarModal(id) {
+    document.getElementById(id).style.display = 'none';
+    if (id === 'modalExportar') {
+        document.getElementById('opcionesPersonalizadas').style.display = 'none';
+    }
+}
+
+// Inicializar al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar datos si es necesario
+    window.ultimosDatosCalculados = window.ultimosDatosCalculados || {};
+    
+    // Inicializar los datos de flujo
+    window.datosFlujo = {
+        gasExtraido: 0,
+        gasSeparado: 0,
+        gasComprimido: 0,
+        gasNoUtilizado: 0
+    };
+    
+    // Realizar el cálculo inicial
+    calcular();
+    
+    // Cargar configuraciones guardadas del localStorage
+    configuracionesGuardadas = JSON.parse(localStorage.getItem('configuraciones') || '[]');
+});
+}
