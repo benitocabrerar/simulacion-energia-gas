@@ -12,15 +12,46 @@ let emissionsCompositionChart = null;
 
 // Función para actualizar los gráficos
 function actualizarGraficos(datos) {
+    // Si no hay datos, no actualizar
+    if (!datos || Object.keys(datos).length === 0) {
+        console.error("No hay datos para actualizar los gráficos");
+        return;
+    }
+    
     // Crear una copia protegida para evitar modificar los datos originales
     const datosProtegidos = { ...datos };
     
     // Recuperar la pestaña activa
-    const activeTab = document.querySelector('.tab-content.active').id;
+    const activeTabElement = document.querySelector('.tab-content.active');
+    if (!activeTabElement) {
+        console.error("No se encontró una pestaña activa");
+        return;
+    }
+    
+    const activeTab = activeTabElement.id;
     
     // Gráficos del panel principal
     if (activeTab === 'panel-principal') {
-        // Gráfico de producción
+        actualizarGraficosPanelPrincipal(datosProtegidos);
+    }
+    // Gráficos de la pestaña de proceso
+    else if (activeTab === 'proceso') {
+        actualizarGraficosProceso(datosProtegidos);
+    }
+    // Gráficos de la pestaña financiera
+    else if (activeTab === 'financiero') {
+        actualizarGraficosFinanciero(datosProtegidos);
+    }
+    // Gráficos de la pestaña ambiental
+    else if (activeTab === 'ambiental') {
+        actualizarGraficosAmbiental(datosProtegidos);
+    }
+}
+
+// Función para actualizar los gráficos del panel principal
+function actualizarGraficosPanelPrincipal(datosProtegidos) {
+    // Gráfico de producción
+    if (document.getElementById('productionChart')) {
         if (productionChart) {
             productionChart.destroy();
         }
@@ -75,8 +106,10 @@ function actualizarGraficos(datos) {
                 }
             }
         });
-        
-        // Gráfico de energía
+    }
+    
+    // Gráfico de energía
+    if (document.getElementById('energyChart')) {
         if (energyChart) {
             energyChart.destroy();
         }
@@ -123,8 +156,10 @@ function actualizarGraficos(datos) {
                 }
             }
         });
-        
-        // Gráfico financiero
+    }
+    
+    // Gráfico financiero
+    if (document.getElementById('financialChart')) {
         if (financialChart) {
             financialChart.destroy();
         }
@@ -172,8 +207,10 @@ function actualizarGraficos(datos) {
                 }
             }
         });
-        
-        // Gráfico de emisiones
+    }
+    
+    // Gráfico de emisiones
+    if (document.getElementById('emissionsChart')) {
         if (emissionsChart) {
             emissionsChart.destroy();
         }
@@ -213,10 +250,12 @@ function actualizarGraficos(datos) {
             }
         });
     }
-    
-    // Gráficos de la pestaña de proceso
-    else if (activeTab === 'proceso') {
-        // Gráfico de flujo
+}
+
+// Función para actualizar los gráficos de la pestaña proceso
+function actualizarGraficosProceso(datosProtegidos) {
+    // Gráfico de flujo
+    if (document.getElementById('flowChart')) {
         if (flowChart) {
             flowChart.destroy();
         }
@@ -263,8 +302,10 @@ function actualizarGraficos(datos) {
                 }
             }
         });
-        
-        // Gráfico de eficiencia
+    }
+    
+    // Gráfico de eficiencia
+    if (document.getElementById('efficiencyChart')) {
         if (efficiencyChart) {
             efficiencyChart.destroy();
         }
@@ -322,10 +363,12 @@ function actualizarGraficos(datos) {
             }
         });
     }
-    
-    // Gráficos de la pestaña financiera
-    else if (activeTab === 'financiero') {
-        // Gráfico de desglose de costos
+}
+
+// Función para actualizar los gráficos de la pestaña financiero
+function actualizarGraficosFinanciero(datosProtegidos) {
+    // Gráfico de desglose de costos
+    if (document.getElementById('costBreakdownChart')) {
         if (costBreakdownChart) {
             costBreakdownChart.destroy();
         }
@@ -367,8 +410,10 @@ function actualizarGraficos(datos) {
                 }
             }
         });
-        
-        // Gráfico de flujo de caja
+    }
+    
+    // Gráfico de flujo de caja
+    if (document.getElementById('cashFlowChart')) {
         if (cashFlowChart) {
             cashFlowChart.destroy();
         }
@@ -438,10 +483,12 @@ function actualizarGraficos(datos) {
             }
         });
     }
-    
-    // Gráficos de la pestaña ambiental
-    else if (activeTab === 'ambiental') {
-        // Gráfico de comparación de intensidad de carbono
+}
+
+// Función para actualizar los gráficos de la pestaña ambiental
+function actualizarGraficosAmbiental(datosProtegidos) {
+    // Gráfico de comparación de intensidad de carbono
+    if (document.getElementById('carbonComparisonChart')) {
         if (carbonComparisonChart) {
             carbonComparisonChart.destroy();
         }
@@ -487,8 +534,10 @@ function actualizarGraficos(datos) {
                 }
             }
         });
-        
-        // Gráfico de composición de emisiones
+    }
+    
+    // Gráfico de composición de emisiones
+    if (document.getElementById('emissionsCompositionChart')) {
         if (emissionsCompositionChart) {
             emissionsCompositionChart.destroy();
         }
@@ -536,6 +585,11 @@ function actualizarGraficos(datos) {
 // Exportar gráfico como imagen
 function exportarGrafico(chartId) {
     const canvas = document.getElementById(chartId);
+    if (!canvas) {
+        console.error(`No se encontró el gráfico con ID: ${chartId}`);
+        return;
+    }
+    
     const imgData = canvas.toDataURL('image/png');
     
     // Crear un enlace temporal para descargar la imagen
