@@ -4,588 +4,558 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulación de Generación Eléctrica con Gas Asociado</title>
-    <!-- Cargar React y ReactDOM desde CDN -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Cargar Babel para JSX -->
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <!-- Cargar Recharts -->
-    <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
     <style>
+        * { box-sizing: border-box; }
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            padding: 20px;
+            background-color: #f5f7fa;
         }
-        
-        /* Estilos para la simulación */
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .w-full { width: 100%; }
-        .p-4 { padding: 1rem; }
-        .bg-gray-50 { background-color: #f9fafb; }
-        .text-2xl { font-size: 1.5rem; }
-        .font-bold { font-weight: 700; }
-        .text-center { text-align: center; }
-        .mb-4 { margin-bottom: 1rem; }
-        .bg-white { background-color: white; }
-        .rounded-lg { border-radius: 0.5rem; }
-        .shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
-        .text-lg { font-size: 1.125rem; }
-        .font-semibold { font-weight: 600; }
-        .mb-2 { margin-bottom: 0.5rem; }
-        .grid { display: grid; }
-        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-        .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-        .gap-4 { gap: 1rem; }
-        .block { display: block; }
-        .text-sm { font-size: 0.875rem; }
-        .font-medium { font-weight: 500; }
-        .text-gray-700 { color: #374151; }
-        .w-full { width: 100%; }
-        .mt-2 { margin-top: 0.5rem; }
-        .flex-wrap { flex-wrap: wrap; }
-        .gap-2 { gap: 0.5rem; }
-        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-        .rounded { border-radius: 0.25rem; }
-        .bg-blue-500 { background-color: #3b82f6; }
-        .text-white { color: white; }
-        .bg-gray-200 { background-color: #e5e7eb; }
-        .text-xl { font-size: 1.25rem; }
-        .text-gray-500 { color: #6b7280; }
-        .text-green-600 { color: #059669; }
-        .text-red-600 { color: #dc2626; }
-        .text-xs { font-size: 0.75rem; }
-        .text-3xl { font-size: 1.875rem; }
-        .border-2 { border-width: 2px; }
-        .border-gray-200 { border-color: #e5e7eb; }
-        .border-red-200 { border-color: #fecaca; }
-        .border-green-200 { border-color: #a7f3d0; }
-        .bg-yellow-100 { background-color: #fef3c7; }
-        .bg-blue-100 { background-color: #dbeafe; }
-        .bg-purple-100 { background-color: #ede9fe; }
-        .bg-red-100 { background-color: #fee2e2; }
-        .bg-green-100 { background-color: #d1fae5; }
-        .overflow-x-auto { overflow-x: auto; }
-        .min-w-full { min-width: 100%; }
-        .divide-y { border-top-width: 1px; border-bottom-width: 1px; }
-        .divide-gray-200 { border-color: #e5e7eb; }
-        .bg-gray-50 { background-color: #f9fafb; }
-        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-        .text-left { text-align: left; }
-        .uppercase { text-transform: uppercase; }
-        .tracking-wider { letter-spacing: 0.05em; }
-        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .whitespace-nowrap { white-space: nowrap; }
-        .bg-gray-100 { background-color: #f3f4f6; }
-        
-        @media (min-width: 768px) {
-            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
         }
-        
-        @media (min-width: 1024px) {
-            .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        h1, h2, h3 { color: #2c3e50; }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .panel {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .control-item {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .result-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .result-card h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .value {
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .positive { color: #27ae60; }
+        .negative { color: #e74c3c; }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 30px 0;
+            gap: 5px;
+        }
+        .process-box {
+            background-color: #e8f4fd;
+            border-radius: 8px;
+            padding: 15px;
+            width: 160px;
+            text-align: center;
+        }
+        .arrow {
+            font-size: 24px;
+            color: #7f8c8d;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
-
-    <script type="text/babel">
-        /* Simulación de Generación Eléctrica a partir de Gas Asociado */
+    <div class="container">
+        <h1>Simulación de Generación Eléctrica a partir de Gas Asociado</h1>
         
-        // Descomponer los componentes necesarios de Recharts
-        const {
-            LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, 
-            CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area
-        } = Recharts;
+        <div class="panel">
+            <h2>Parámetros de Simulación</h2>
+            <div class="controls">
+                <div class="control-item">
+                    <label>Pozos Activos: <span id="pozosValue">5</span></label>
+                    <input type="range" min="1" max="20" value="5" id="pozos">
+                </div>
+                <div class="control-item">
+                    <label>Gas Disponible (miles m³/día): <span id="gasValue">100</span></label>
+                    <input type="range" min="10" max="500" step="10" value="100" id="gas">
+                </div>
+                <div class="control-item">
+                    <label>GOR (pies³/bbl): <span id="gorValue">1000</span></label>
+                    <input type="range" min="500" max="5000" step="100" value="1000" id="gor">
+                </div>
+                <div class="control-item">
+                    <label>Eficiencia Separación (%): <span id="sepValue">85</span></label>
+                    <input type="range" min="60" max="98" value="85" id="sep">
+                </div>
+                <div class="control-item">
+                    <label>Eficiencia Compresión (%): <span id="compValue">90</span></label>
+                    <input type="range" min="70" max="98" value="90" id="comp">
+                </div>
+                <div class="control-item">
+                    <label>Eficiencia Turbina (%): <span id="turbValue">38</span></label>
+                    <input type="range" min="25" max="45" value="38" id="turb">
+                </div>
+                <div class="control-item">
+                    <label>Precio Electricidad (USD/MWh): <span id="precioValue">75</span></label>
+                    <input type="range" min="30" max="150" value="75" id="precio">
+                </div>
+                <div class="control-item">
+                    <label>Costo Operativo (USD/MWh): <span id="costoValue">15</span></label>
+                    <input type="range" min="5" max="40" value="15" id="costo">
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn btn-primary" id="calcular">Calcular Resultados</button>
+                <button class="btn btn-secondary" id="toggleUnits">Usar Unidades Imperiales</button>
+            </div>
+        </div>
         
-        // Componente principal
-        const SimulacionEnergiaGas = () => {
-            // Estados para los parámetros configurables del usuario
-            const [pozosActivos, setPozosActivos] = React.useState(5);
-            const [gasDisponible, setGasDisponible] = React.useState(100); // Miles de m³/día
-            const [eficienciaSeparacion, setEficienciaSeparacion] = React.useState(85); // %
-            const [eficienciaCompresion, setEficienciaCompresion] = React.useState(90); // %
-            const [eficienciaTurbina, setEficienciaTurbina] = React.useState(38); // %
-            const [precioElectricidad, setPrecioElectricidad] = React.useState(75); // USD/MWh
-            const [costoOperativo, setCostoOperativo] = React.useState(15); // USD/MWh
-            const [costoCapital, setCostoCapital] = React.useState(1200); // USD/kW instalado
-            const [verHistorico, setVerHistorico] = React.useState(false);
-            const [unidadesImperiales, setUnidadesImperiales] = React.useState(false);
-            const [GOR, setGOR] = React.useState(1000); // Gas-Oil Ratio: pies cúbicos de gas por barril de petróleo
-
-            // Estados calculados basados en los parámetros
-            const [datosProceso, setDatosProceso] = React.useState({});
-            const [datosEconomicos, setDatosEconomicos] = React.useState({});
-            const [datosEmisiones, setDatosEmisiones] = React.useState({});
-            const [datosHistoricos, setDatosHistoricos] = React.useState([]);
-            const [tiempoActual, setTiempoActual] = React.useState(0);
-            const [datosPetroleo, setDatosPetroleo] = React.useState({});
-
-            // Factores de conversión
-            const M3_A_PIES3 = 35.3147; // 1 m³ = 35.3147 pies³
-            const KG_A_TON = 0.001; // 1 kg = 0.001 toneladas
-
-            // Actualiza los cálculos cuando cambian los parámetros
-            React.useEffect(() => {
-                calcularProceso();
-                const timer = setInterval(() => {
-                    setTiempoActual(t => t + 1);
-                    agregarDatosHistoricos();
-                }, 5000); // Actualizar cada 5 segundos
-                
-                return () => clearInterval(timer);
-            }, [pozosActivos, gasDisponible, eficienciaSeparacion, eficienciaCompresion, eficienciaTurbina, 
-                precioElectricidad, costoOperativo, costoCapital, tiempoActual, GOR]);
-
-            // Calcula todos los parámetros del proceso
-            const calcularProceso = () => {
-                // Variación aleatoria pequeña para simular fluctuaciones
-                const variacion = () => 0.95 + Math.random() * 0.1;
-                
-                // Cálculos para el proceso
-                const gasExtraido = gasDisponible * pozosActivos * variacion();
-                const gasSeparado = gasExtraido * (eficienciaSeparacion/100) * variacion();
-                const gasComprimido = gasSeparado * (eficienciaCompresion/100) * variacion();
-                
-                // Propiedades del gas (valores típicos)
-                const poderCalorifico = 9400; // kcal/m³ (valor típico para gas natural)
-                const poderCalorificoTotal = gasComprimido * poderCalorifico; // kcal totales
-                
-                // Energía térmica disponible (MWh)
-                const energiaTermica = gasComprimido * poderCalorifico * 0.00116; // Conversión a MWh
-                
-                // Generación eléctrica
-                const energiaElectrica = energiaTermica * (eficienciaTurbina/100);
-                const perdidas = energiaElectrica * 0.05; // 5% de pérdidas en transmisión
-                const energiaEntregada = energiaElectrica - perdidas;
-                
-                // Cálculos económicos
-                const ingresos = energiaEntregada * precioElectricidad;
-                const gastos = energiaEntregada * costoOperativo + (costoCapital * energiaElectrica / 365 / 24);
-                const beneficio = ingresos - gastos;
-                const retornoInversion = (beneficio / gastos) * 100;
-                
-                // Cálculos de emisiones
-                const emisionesCO2 = gasComprimido * 2.1; // kg CO2/m³ gas (aproximado)
-                const emisionesNOx = gasComprimido * 0.005; // kg NOx/m³ gas
-                const emisionesSO2 = gasComprimido * 0.001; // kg SO2/m³ gas
-                
-                // Residuos y gas no utilizado
-                const gasNoUtilizado = gasExtraido - gasComprimido;
-                const residuosCombustion = gasComprimido * 0.02; // 2% del gas genera residuos
-                
-                // Cálculo de producción de petróleo (basado en el GOR - Gas-Oil Ratio)
-                // Convertimos primero el gas a pies cúbicos para usar el GOR estándar
-                const gasExtraidoPies3 = gasExtraido * 1000 * M3_A_PIES3; // Convertir miles de m³ a pies³
-                const produccionPetroleo = gasExtraidoPies3 / GOR; // Barriles de petróleo por día
-                const produccionPetroleoDiaria = produccionPetroleo;
-                const produccionPetroleoMensual = produccionPetroleoDiaria * 30;
-                const produccionPetroleoAnual = produccionPetroleoDiaria * 365;
-                
-                // Producción de gas en diferentes unidades y periodos
-                const produccionGasDiaria = gasExtraido; // miles de m³/día
-                const produccionGasDiariaPies3 = gasExtraido * 1000 * M3_A_PIES3; // pies³/día
-                const produccionGasMensual = produccionGasDiaria * 30; // miles de m³/mes
-                const produccionGasAnual = produccionGasDiaria * 365; // miles de m³/año
-                
-                // Actualiza los estados
-                setDatosProceso({
-                  gasExtraido,
-                  gasSeparado,
-                  gasComprimido,
-                  gasNoUtilizado,
-                  energiaTermica,
-                  energiaElectrica,
-                  perdidas,
-                  energiaEntregada,
-                  residuosCombustion,
-                  poderCalorificoTotal
-                });
-                
-                setDatosEconomicos({
-                  ingresos,
-                  gastos,
-                  beneficio,
-                  retornoInversion
-                });
-                
-                setDatosEmisiones({
-                  emisionesCO2,
-                  emisionesNOx,
-                  emisionesSO2
-                });
-                
-                setDatosPetroleo({
-                  produccionPetroleoDiaria,
-                  produccionPetroleoMensual,
-                  produccionPetroleoAnual,
-                  produccionGasDiaria,
-                  produccionGasDiariaPies3,
-                  produccionGasMensual,
-                  produccionGasAnual
-                });
-            };
+        <div class="results">
+            <div class="result-card">
+                <h3>Producción de Gas</h3>
+                <div class="data-row">
+                    <span>Gas Extraído:</span>
+                    <span class="value" id="gasExtraido">0 miles m³/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Gas Procesado:</span>
+                    <span class="value" id="gasComprimido">0 miles m³/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Eficiencia Total:</span>
+                    <span class="value" id="eficienciaTotal">0 %</span>
+                </div>
+                <div class="data-row">
+                    <span>Gas No Utilizado:</span>
+                    <span class="value" id="gasNoUtilizado">0 miles m³/día</span>
+                </div>
+            </div>
             
-            // Agrega datos al registro histórico
-            const agregarDatosHistoricos = () => {
-                if (datosProceso.energiaEntregada) {
-                    const nuevosDatos = {
-                        tiempo: new Date().toLocaleTimeString(),
-                        energiaEntregada: datosProceso.energiaEntregada,
-                        ingresos: datosEconomicos.ingresos,
-                        gastos: datosEconomicos.gastos,
-                        beneficio: datosEconomicos.beneficio,
-                        produccionPetroleo: datosPetroleo.produccionPetroleoDiaria,
-                        produccionGas: datosProceso.gasExtraido
-                    };
-                    
-                    setDatosHistoricos(prev => {
-                        const nuevos = [...prev, nuevosDatos];
-                        return nuevos.slice(-24); // Mantener solo las últimas 24 muestras
-                    });
-                }
-            };
+            <div class="result-card">
+                <h3>Generación Eléctrica</h3>
+                <div class="data-row">
+                    <span>Energía Generada:</span>
+                    <span class="value" id="energiaGenerada">0 MWh/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Energía Entregada:</span>
+                    <span class="value" id="energiaEntregada">0 MWh/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Factor de Planta:</span>
+                    <span class="value" id="factorPlanta">0 %</span>
+                </div>
+                <div class="data-row">
+                    <span>Eficiencia Eléctrica:</span>
+                    <span class="value" id="eficienciaElectrica">0 %</span>
+                </div>
+            </div>
             
-            // Funciones para conversión de unidades
-            const convertirGas = (valor) => {
-                if (unidadesImperiales) {
-                    return (valor * 1000 * M3_A_PIES3).toFixed(0) + " pies³/día";
-                } else {
-                    return valor.toFixed(2) + " miles m³/día";
-                }
-            };
-            
-            const convertirEmisiones = (valor) => {
-                if (unidadesImperiales) {
-                    return (valor * KG_A_TON).toFixed(3) + " ton/día";
-                } else {
-                    return valor.toFixed(1) + " kg/día";
-                }
-            };
-            
-            // Datos para gráficos
-            const datosFlujo = [
-                { name: 'Gas Extraído', value: datosProceso.gasExtraido || 0 },
-                { name: 'Gas Separado', value: datosProceso.gasSeparado || 0 },
-                { name: 'Gas Comprimido', value: datosProceso.gasComprimido || 0 },
-                { name: 'Gas No Utilizado', value: datosProceso.gasNoUtilizado || 0 },
-                { name: 'Residuos', value: datosProceso.residuosCombustion || 0 }
-            ];
-            
-            const datosEnergia = [
-                { name: 'Energía Térmica', value: datosProceso.energiaTermica || 0 },
-                { name: 'Energía Eléctrica', value: datosProceso.energiaElectrica || 0 },
-                { name: 'Pérdidas', value: datosProceso.perdidas || 0 },
-                { name: 'Energía Entregada', value: datosProceso.energiaEntregada || 0 }
-            ];
-            
-            const datosEmisionesPie = [
-                { name: 'CO2', value: datosEmisiones.emisionesCO2 || 0 },
-                { name: 'NOx', value: datosEmisiones.emisionesNOx || 0 },
-                { name: 'SO2', value: datosEmisiones.emisionesSO2 || 0 }
-            ];
-            
-            const datosEconomicosPie = [
-                { name: 'Ingresos', value: datosEconomicos.ingresos || 0 },
-                { name: 'Gastos', value: datosEconomicos.gastos || 0 }
-            ];
-            
-            // Datos para los nuevos gráficos
-            const datosProduccionPetroleoGas = [
-                { name: 'Petróleo', value: datosPetroleo.produccionPetroleoDiaria || 0, unidad: 'bbl/día' },
-                { name: 'Gas', value: unidadesImperiales ? 
-                    (datosPetroleo.produccionGasDiariaPies3 || 0) : 
-                    (datosPetroleo.produccionGasDiaria || 0) * 1000, 
-                    unidad: unidadesImperiales ? 'pies³/día' : 'm³/día' }
-            ];
-            
-            // Datos para producción proyectada
-            const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-            const datosProyeccion = meses.map((mes, index) => {
-                // Simulamos una ligera declinación en la producción (1% mensual)
-                const factor = Math.pow(0.99, index);
-                return {
-                    mes,
-                    produccionPetroleo: (datosPetroleo.produccionPetroleoDiaria || 0) * 30 * factor,
-                    produccionGas: (datosPetroleo.produccionGasDiaria || 0) * 30 * factor
-                };
-            });
-            
-            // Definición de colores para gráficos
-            const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
-            const EMISIONES_COLORS = ['#FF8042', '#FFBB28', '#8884d8'];
-
-            return (
-                <div className="flex flex-col w-full p-4 bg-gray-50">
-                    <div className="text-2xl font-bold text-center mb-4">
-                        Simulación de Generación Eléctrica a partir de Gas Asociado
+            <div class="result-card">
+                <h3>Análisis Económico</h3>
+                <div class="data-row">
+                    <span>Ingresos:</span>
+                    <span class="value" id="ingresos">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Costos:</span>
+                    <span class="value" id="costos">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>Beneficio:</span>
+                    <span class="value" id="beneficio">0 USD/día</span>
+                </div>
+                <div class="data-row">
+                    <span>ROI:</span>
+                    <span class="value" id="roi">0 %</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>Resumen de Producción</h2>
+            <div class="results">
+                <div class="result-card">
+                    <h3>Producción de Petróleo</h3>
+                    <div class="data-row">
+                        <span>Diaria:</span>
+                        <span class="value" id="petroDiario">0 bbl/día</span>
                     </div>
-                    
-                    {/* Panel de Controles */}
-                    <div className="bg-white p-4 rounded-lg shadow mb-4">
-                        <div className="text-lg font-semibold mb-2">Parámetros de Simulación</div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Pozos Activos: {pozosActivos}</label>
-                                <input 
-                                    type="range" 
-                                    min="1" 
-                                    max="20" 
-                                    value={pozosActivos} 
-                                    onChange={(e) => setPozosActivos(Number(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Gas Disponible por Pozo (miles m³/día): {gasDisponible}</label>
-                                <input 
-                                    type="range" 
-                                    min="10" 
-                                    max="500" 
-                                    step="10"
-                                    value={gasDisponible} 
-                                    onChange={(e) => setGasDisponible(Number(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">GOR (pies³/bbl): {GOR}</label>
-                                <input 
-                                    type="range" 
-                                    min="500" 
-                                    max="5000" 
-                                    step="100"
-                                    value={GOR} 
-                                    onChange={(e) => setGOR(Number(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Eficiencia Separación (%): {eficienciaSeparacion}</label>
-                                <input 
-                                    type="range" 
-                                    min="60" 
-                                    max="98" 
-                                    value={eficienciaSeparacion} 
-                                    onChange={(e) => setEficienciaSeparacion(Number(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Eficiencia Compresión (%): {eficienciaCompresion}</label>
-                                <input 
-                                    type="range" 
-                                    min="70" 
-                                    max="98" 
-                                    value={eficienciaCompresion} 
-                                    onChange={(e) => setEficienciaCompresion(Number(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Eficiencia Turbina (%): {eficienciaTurbina}</label>
-                                <input 
-                                    type="range" 
-                                    min="25" 
-                                    max="45" 
-                                    value={eficienciaTurbina} 
-                                    onChange={(e) => setEficienciaTurbina(Number(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Precio Electricidad (USD/MWh): {precioElectricidad}</label>
-                                <input 
-                                    type="range" 
-                                    min="30" 
-                                    max="150" 
-                                    value={precioElectricidad} 
-                                    onChange={(e) => setPrecioElectricidad(Number(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Costo Operativo (USD/MWh): {costoOperativo}</label>
-                                <input 
-                                    type="range" 
-                                    min="5" 
-                                    max="40" 
-                                    value={costoOperativo} 
-                                    onChange={(e) => setCostoOperativo(Number(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-                        </div>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                            <button 
-                                className={`px-3 py-1 rounded ${verHistorico ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                                onClick={() => setVerHistorico(!verHistorico)}
-                            >
-                                {verHistorico ? 'Ver Tiempo Real' : 'Ver Histórico'}
-                            </button>
-                            <button 
-                                className={`px-3 py-1 rounded ${unidadesImperiales ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                                onClick={() => setUnidadesImperiales(!unidadesImperiales)}
-                            >
-                                {unidadesImperiales ? 'Usar Unidades Métricas' : 'Usar Unidades Imperiales'}
-                            </button>
-                        </div>
+                    <div class="data-row">
+                        <span>Mensual:</span>
+                        <span class="value" id="petroMensual">0 bbl/mes</span>
                     </div>
-                    
-                    {/* Panel de Indicadores */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        {/* Producción de Gas */}
-                        <div className="bg-white p-4 rounded-lg shadow">
-                            <div className="text-lg font-semibold mb-2">Producción de Gas</div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                    <div className="text-sm text-gray-500">Gas Extraído</div>
-                                    <div className="text-xl font-bold">{convertirGas(datosProceso.gasExtraido || 0)}</div>
-                                </div>
-                                <div>
-                                    <div className="text-sm text-gray-500">Gas Procesado</div>
-                                    <div className="text-xl font-bold">{convertirGas(datosProceso.gasComprimido || 0)}</div>
-                                </div>
-                                <div>
-                                    <div className="text-sm text-gray-500">Eficiencia Total (%)</div>
-                                    <div className="text-xl font-bold">
-                                        {datosProceso.gasExtraido ? ((datosProceso.gasComprimido / datosProceso.gasExtraido) * 100).toFixed(1) : "0.0"}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="text-sm text-gray-500">Gas No Utilizado</div>
-                                    <div className="text-xl font-bold">{convertirGas(datosProceso.gasNoUtilizado || 0)}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {/* Generación Eléctrica */}
-                        <div className="bg-white p-4 rounded-lg shadow">
-                            <div className="text-lg font-semibold mb-2">Generación Eléctrica</div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                    <div className="text-sm text-gray-500">Energía Generada (MWh/día)</div>
-                                    <div className="text-xl font-bold">{(datosProceso.energiaElectrica || 0).toFixed(2)}</div>
-                                </div>
-                                <div>
-                                    <div className="text-sm text-gray-500">Energía Entregada (MWh/día)</div>
-                                    <div className="text-xl font-bold">{(datosProceso.energiaEntregada || 0).toFixed(2)}</div>
-                                </div>
-                                <div>
-                                    <div className="text-sm text-gray-500">Factor de Planta (%)</div>
-                                    <div className="text-xl font-bold">
-                                        {((datosProceso.energiaElectrica || 0) / (pozosActivos * gasDisponible * 0.00116 * 9400 * 0.45) * 100).toFixed(1)}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="text-sm text-gray-500">Eficiencia Eléctrica (%)</div>
-                                    <div className="text-xl font-bold">{eficienciaTurbina.toFixed(1)}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {/* Análisis Económico */}
-                        <div className="bg-white p-4 rounded-lg shadow">
-                            <div className="text-lg font-semibold mb-2">Análisis Económico</div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                    <div className="text-sm text-gray-500">Ingresos (USD/día)</div>
-                                    <div className="text-xl font-bold">{(datosEconomicos.ingresos || 0).toFixed(2)}</div>
-                                </div>
-                                <div>
-                                    <div className="text-sm text-gray-500">Costos (USD/día)</div>
-                                    <div className="text-xl font-bold">{(datosEconomicos.gastos || 0).toFixed(2)}</div>
-                                </div>
-                                <div>
-                                    <div className="text-sm text-gray-500">Beneficio (USD/día)</div>
-                                    <div className={`text-xl font-bold ${(datosEconomicos.beneficio || 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                        {(datosEconomicos.beneficio || 0).toFixed(2)}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="text-sm text-gray-500">ROI (%)</div>
-                                    <div className={`text-xl font-bold ${(datosEconomicos.retornoInversion || 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                        {(datosEconomicos.retornoInversion || 0).toFixed(1)}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* Esquema del Proceso */}
-                    <div className="bg-white p-4 rounded-lg shadow mb-4">
-                        <div className="text-lg font-semibold mb-2">Esquema del Proceso</div>
-                        <div className="flex flex-wrap justify-between items-center border-2 border-gray-200 p-4 rounded-lg">
-                            <div className="flex flex-col items-center m-2 p-2 bg-yellow-100 rounded-lg w-32">
-                                <div className="font-bold mb-1">Pozo</div>
-                                <div className="text-sm">{convertirGas(datosProceso.gasExtraido || 0)}</div>
-                            </div>
-                            <div className="text-3xl">→</div>
-                            
-                            <div className="flex flex-col items-center m-2 p-2 bg-blue-100 rounded-lg w-32">
-                                <div className="font-bold mb-1">Separador</div>
-                                <div className="text-sm">{convertirGas(datosProceso.gasSeparado || 0)}</div>
-                                <div className="text-xs text-gray-500">Ef: {eficienciaSeparacion}%</div>
-                            </div>
-                            <div className="text-3xl">→</div>
-                            
-                            <div className="flex flex-col items-center m-2 p-2 bg-purple-100 rounded-lg w-32">
-                                <div className="font-bold mb-1">Compresión</div>
-                                <div className="text-sm">{convertirGas(datosProceso.gasComprimido || 0)}</div>
-                                <div className="text-xs text-gray-500">Ef: {eficienciaCompresion}%</div>
-                            </div>
-                            <div className="text-3xl">→</div>
-                            
-                            <div className="flex flex-col items-center m-2 p-2 bg-red-100 rounded-lg w-32">
-                                <div className="font-bold mb-1">Turbina</div>
-                                <div className="text-sm">{(datosProceso.energiaElectrica || 0).toFixed(1)} MWh/día</div>
-                                <div className="text-xs text-gray-500">Ef: {eficienciaTurbina}%</div>
-                            </div>
-                            <div className="text-3xl">→</div>
-                            
-                            <div className="flex flex-col items-center m-2 p-2 bg-green-100 rounded-lg w-32">
-                                <div className="font-bold mb-1">Red Eléctrica</div>
-                                <div className="text-sm">{(datosProceso.energiaEntregada || 0).toFixed(1)} MWh/día</div>
-                                <div className="text-xs text-gray-500">Pérdidas: 5%</div>
-                            </div>
-                        </div>
-                        <div className="mt-2 grid grid-cols-2 gap-4">
-                            <div className="border-2 border-red-200 p-2 rounded-lg">
-                                <div className="font-bold">Residuos y Emisiones:</div>
-                                <div>- CO2: {convertirEmisiones(datosEmisiones.emisionesCO2 || 0)}</div>
-                                <div>- NOx: {convertirEmisiones(datosEmisiones.emisionesNOx || 0)}</div>
-                                <div>- SO2: {convertirEmisiones(datosEmisiones.emisionesSO2 || 0)}</div>
-                                <div>- Gas no utilizado: {convertirGas(datosProceso.gasNoUtilizado || 0)}</div>
-                            </div>
-                            <div className="border-2 border-green-200 p-2 rounded-lg">
-                                <div className="font-bold">Datos Económicos Acumulados:</div>
-                                <div>- Ingresos anuales: ${((datosEconomicos.ingresos || 0) * 365).toFixed(0)} USD</div>
-                                <div>- Costos anuales: ${((datosEconomicos.gastos || 0) * 365).toFixed(0)} USD</div>
-                                <div>- Beneficio anual: ${((datosEconomicos.beneficio || 0) * 365).toFixed(0)} USD</div>
-                                <div>- Retorno de inversión: {(datosEconomicos.retornoInversion || 0).toFixed(1)}%</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* Pie de página */}
-                    <div className="text-center text-sm text-gray-500 mt-4">
-                        Simulación de Generación Eléctrica a partir de Gas Asociado a Producción Petrolera
+                    <div class="data-row">
+                        <span>Anual:</span>
+                        <span class="value" id="petroAnual">0 bbl/año</span>
                     </div>
                 </div>
-            );
-        };
+                
+                <div class="result-card">
+                    <h3>Producción de Gas</h3>
+                    <div class="data-row">
+                        <span>Diaria:</span>
+                        <span class="value" id="gasDiario">0 miles m³/día</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Mensual:</span>
+                        <span class="value" id="gasMensual">0 miles m³/mes</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Anual:</span>
+                        <span class="value" id="gasAnual">0 miles m³/año</span>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h3>Generación Eléctrica</h3>
+                    <div class="data-row">
+                        <span>Diaria:</span>
+                        <span class="value" id="energiaDiaria">0 MWh/día</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Mensual:</span>
+                        <span class="value" id="energiaMensual">0 MWh/mes</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Anual:</span>
+                        <span class="value" id="energiaAnual">0 MWh/año</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>Esquema del Proceso</h2>
+            <div class="flow-diagram">
+                <div class="process-box">
+                    <h3>Pozo</h3>
+                    <p id="flowPozo">0 miles m³/día</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="process-box">
+                    <h3>Separador</h3>
+                    <p id="flowSeparador">0 miles m³/día</p>
+                    <small id="flowSepEf">Ef: 85%</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="process-box">
+                    <h3>Compresión</h3>
+                    <p id="flowCompresion">0 miles m³/día</p>
+                    <small id="flowCompEf">Ef: 90%</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="process-box">
+                    <h3>Turbina</h3>
+                    <p id="flowTurbina">0 MWh/día</p>
+                    <small id="flowTurbEf">Ef: 38%</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="process-box">
+                    <h3>Red Eléctrica</h3>
+                    <p id="flowRed">0 MWh/día</p>
+                    <small>Pérdidas: 5%</small>
+                </div>
+            </div>
+            
+            <div class="results">
+                <div class="result-card">
+                    <h3>Residuos y Emisiones</h3>
+                    <div class="data-row">
+                        <span>CO2:</span>
+                        <span class="value" id="co2">0 kg/día</span>
+                    </div>
+                    <div class="data-row">
+                        <span>NOx:</span>
+                        <span class="value" id="nox">0 kg/día</span>
+                    </div>
+                    <div class="data-row">
+                        <span>SO2:</span>
+                        <span class="value" id="so2">0 kg/día</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Gas no utilizado:</span>
+                        <span class="value" id="gasNoUtil">0 miles m³/día</span>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h3>Datos Económicos Acumulados</h3>
+                    <div class="data-row">
+                        <span>Ingresos anuales:</span>
+                        <span class="value" id="ingresosAnuales">$0 USD</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Costos anuales:</span>
+                        <span class="value" id="costosAnuales">$0 USD</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Beneficio anual:</span>
+                        <span class="value" id="beneficioAnual">$0 USD</span>
+                    </div>
+                    <div class="data-row">
+                        <span>Retorno de inversión:</span>
+                        <span class="value" id="roiAnual">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            Simulación de Generación Eléctrica a partir de Gas Asociado a Producción Petrolera
+        </footer>
+    </div>
 
-        // Renderizar el componente principal
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<SimulacionEnergiaGas />);
+    <script>
+        // Constantes de conversión
+        const M3_A_PIES3 = 35.3147; // 1 m³ = 35.3147 pies³
+        const KG_A_TON = 0.001;     // 1 kg = 0.001 toneladas
+        
+        // Variables de estado
+        let unidadesImperiales = false;
+        
+        // Función para actualizar valores de los controles deslizantes
+        function actualizarValores() {
+            document.getElementById('pozosValue').textContent = document.getElementById('pozos').value;
+            document.getElementById('gasValue').textContent = document.getElementById('gas').value;
+            document.getElementById('gorValue').textContent = document.getElementById('gor').value;
+            document.getElementById('sepValue').textContent = document.getElementById('sep').value;
+            document.getElementById('compValue').textContent = document.getElementById('comp').value;
+            document.getElementById('turbValue').textContent = document.getElementById('turb').value;
+            document.getElementById('precioValue').textContent = document.getElementById('precio').value;
+            document.getElementById('costoValue').textContent = document.getElementById('costo').value;
+        }
+        
+        // Convertir valores según unidades
+        function convertirGas(valor) {
+            if (unidadesImperiales) {
+                return (valor * 1000 * M3_A_PIES3).toFixed(0) + " pies³/día";
+            } else {
+                return valor.toFixed(2) + " miles m³/día";
+            }
+        }
+        
+        function convertirEmisiones(valor) {
+            if (unidadesImperiales) {
+                return (valor * KG_A_TON).toFixed(3) + " ton/día";
+            } else {
+                return valor.toFixed(1) + " kg/día";
+            }
+        }
+        
+        // Función principal de cálculo
+        function calcular() {
+            // Obtener valores de entrada
+            const pozosActivos = parseInt(document.getElementById('pozos').value);
+            const gasDisponible = parseInt(document.getElementById('gas').value);
+            const GOR = parseInt(document.getElementById('gor').value);
+            const eficienciaSeparacion = parseInt(document.getElementById('sep').value);
+            const eficienciaCompresion = parseInt(document.getElementById('comp').value);
+            const eficienciaTurbina = parseInt(document.getElementById('turb').value);
+            const precioElectricidad = parseInt(document.getElementById('precio').value);
+            const costoOperativo = parseInt(document.getElementById('costo').value);
+            const costoCapital = 1200; // USD/kW instalado (valor fijo)
+            
+            // Variación aleatoria para simular fluctuaciones
+            const variacion = 0.95 + Math.random() * 0.1;
+            
+            // Cálculos para el proceso
+            const gasExtraido = gasDisponible * pozosActivos * variacion;
+            const gasSeparado = gasExtraido * (eficienciaSeparacion/100) * variacion;
+            const gasComprimido = gasSeparado * (eficienciaCompresion/100) * variacion;
+            
+            // Propiedades del gas
+            const poderCalorifico = 9400; // kcal/m³
+            const poderCalorificoTotal = gasComprimido * poderCalorifico;
+            
+            // Energía térmica y eléctrica
+            const energiaTermica = gasComprimido * poderCalorifico * 0.00116; // Conversión a MWh
+            const energiaElectrica = energiaTermica * (eficienciaTurbina/100);
+            const perdidas = energiaElectrica * 0.05; // 5% de pérdidas
+            const energiaEntregada = energiaElectrica - perdidas;
+            
+            // Cálculos económicos
+            const ingresos = energiaEntregada * precioElectricidad;
+            const gastos = energiaEntregada * costoOperativo + (costoCapital * energiaElectrica / 365 / 24);
+            const beneficio = ingresos - gastos;
+            const retornoInversion = (beneficio / gastos) * 100;
+            
+            // Emisiones y residuos
+            const emisionesCO2 = gasComprimido * 2.1; // kg CO2/m³ gas
+            const emisionesNOx = gasComprimido * 0.005; // kg NOx/m³ gas
+            const emisionesSO2 = gasComprimido * 0.001; // kg SO2/m³ gas
+            const gasNoUtilizado = gasExtraido - gasComprimido;
+            const residuosCombustion = gasComprimido * 0.02; // 2% residuos
+            
+            // Cálculos de petróleo
+            const gasExtraidoPies3 = gasExtraido * 1000 * M3_A_PIES3;
+            const produccionPetroleoDiaria = gasExtraidoPies3 / GOR;
+            const produccionPetroleoMensual = produccionPetroleoDiaria * 30;
+            const produccionPetroleoAnual = produccionPetroleoDiaria * 365;
+            
+            // Producción de gas en diferentes períodos
+            const produccionGasDiaria = gasExtraido;
+            const produccionGasDiariaPies3 = gasExtraido * 1000 * M3_A_PIES3;
+            const produccionGasMensual = produccionGasDiaria * 30;
+            const produccionGasAnual = produccionGasDiaria * 365;
+            
+            // Actualizar interfaz con resultados
+            // Producción de gas
+            document.getElementById('gasExtraido').textContent = convertirGas(gasExtraido);
+            document.getElementById('gasComprimido').textContent = convertirGas(gasComprimido);
+            document.getElementById('eficienciaTotal').textContent = ((gasComprimido / gasExtraido) * 100).toFixed(1) + " %";
+            document.getElementById('gasNoUtilizado').textContent = convertirGas(gasNoUtilizado);
+            
+            // Generación eléctrica
+            document.getElementById('energiaGenerada').textContent = energiaElectrica.toFixed(2) + " MWh/día";
+            document.getElementById('energiaEntregada').textContent = energiaEntregada.toFixed(2) + " MWh/día";
+            document.getElementById('factorPlanta').textContent = ((energiaElectrica / (pozosActivos * gasDisponible * 0.00116 * 9400 * 0.45)) * 100).toFixed(1) + " %";
+            document.getElementById('eficienciaElectrica').textContent = eficienciaTurbina + " %";
+            
+            // Análisis económico
+            document.getElementById('ingresos').textContent = ingresos.toFixed(2) + " USD/día";
+            document.getElementById('costos').textContent = gastos.toFixed(2) + " USD/día";
+            document.getElementById('beneficio').textContent = beneficio.toFixed(2) + " USD/día";
+            document.getElementById('beneficio').className = beneficio > 0 ? "value positive" : "value negative";
+            document.getElementById('roi').textContent = retornoInversion.toFixed(1) + " %";
+            document.getElementById('roi').className = retornoInversion > 0 ? "value positive" : "value negative";
+            
+            // Producción de petróleo
+            document.getElementById('petroDiario').textContent = produccionPetroleoDiaria.toFixed(0) + " bbl/día";
+            document.getElementById('petroMensual').textContent = produccionPetroleoMensual.toFixed(0) + " bbl/mes";
+            document.getElementById('petroAnual').textContent = produccionPetroleoAnual.toFixed(0) + " bbl/año";
+            
+            // Producción de gas
+            if (unidadesImperiales) {
+                document.getElementById('gasDiario').textContent = (produccionGasDiariaPies3 / 1000000).toFixed(2) + " MMSCF/día";
+                document.getElementById('gasMensual').textContent = (produccionGasDiariaPies3 * 30 / 1000000).toFixed(2) + " MMSCF/mes";
+                document.getElementById('gasAnual').textContent = (produccionGasDiariaPies3 * 365 / 1000000).toFixed(2) + " MMSCF/año";
+            } else {
+                document.getElementById('gasDiario').textContent = produccionGasDiaria.toFixed(2) + " miles m³/día";
+                document.getElementById('gasMensual').textContent = produccionGasMensual.toFixed(2) + " miles m³/mes";
+                document.getElementById('gasAnual').textContent = produccionGasAnual.toFixed(2) + " miles m³/año";
+            }
+            
+            // Generación eléctrica por períodos
+            document.getElementById('energiaDiaria').textContent = energiaEntregada.toFixed(2) + " MWh/día";
+            document.getElementById('energiaMensual').textContent = (energiaEntregada * 30).toFixed(0) + " MWh/mes";
+            document.getElementById('energiaAnual').textContent = (energiaEntregada * 365).toFixed(0) + " MWh/año";
+            
+            // Diagrama de flujo
+            document.getElementById('flowPozo').textContent = convertirGas(gasExtraido);
+            document.getElementById('flowSeparador').textContent = convertirGas(gasSeparado);
+            document.getElementById('flowSepEf').textContent = "Ef: " + eficienciaSeparacion + "%";
+            document.getElementById('flowCompresion').textContent = convertirGas(gasComprimido);
+            document.getElementById('flowCompEf').textContent = "Ef: " + eficienciaCompresion + "%";
+            document.getElementById('flowTurbina').textContent = energiaElectrica.toFixed(1) + " MWh/día";
+            document.getElementById('flowTurbEf').textContent = "Ef: " + eficienciaTurbina + "%";
+            document.getElementById('flowRed').textContent = energiaEntregada.toFixed(1) + " MWh/día";
+            
+            // Emisiones
+            document.getElementById('co2').textContent = convertirEmisiones(emisionesCO2);
+            document.getElementById('nox').textContent = convertirEmisiones(emisionesNOx);
+            document.getElementById('so2').textContent = convertirEmisiones(emisionesSO2);
+            document.getElementById('gasNoUtil').textContent = convertirGas(gasNoUtilizado);
+            
+            // Datos económicos anuales
+            document.getElementById('ingresosAnuales').textContent = "$" + (ingresos * 365).toFixed(0) + " USD";
+            document.getElementById('costosAnuales').textContent = "$" + (gastos * 365).toFixed(0) + " USD";
+            document.getElementById('beneficioAnual').textContent = "$" + (beneficio * 365).toFixed(0) + " USD";
+            document.getElementById('beneficioAnual').className = beneficio > 0 ? "value positive" : "value negative";
+            document.getElementById('roiAnual').textContent = retornoInversion.toFixed(1) + "%";
+            document.getElementById('roiAnual').className = retornoInversion > 0 ? "value positive" : "value negative";
+        }
+        
+        // Cambiar entre unidades métricas e imperiales
+        function toggleUnidades() {
+            unidadesImperiales = !unidadesImperiales;
+            document.getElementById('toggleUnits').textContent = unidadesImperiales 
+                ? "Usar Unidades Métricas" 
+                : "Usar Unidades Imperiales";
+            calcular(); // Recalcular con las nuevas unidades
+        }
+        
+        // Configurar eventos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar valores de controles
+            actualizarValores();
+            
+            // Calcular valores iniciales
+            calcular();
+            
+            // Añadir eventos a controles deslizantes
+            const sliders = ['pozos', 'gas', 'gor', 'sep', 'comp', 'turb', 'precio', 'costo'];
+            sliders.forEach(slider => {
+                document.getElementById(slider).addEventListener('input', function() {
+                    actualizarValores();
+                    calcular();
+                });
+            });
+            
+            // Botones
+            document.getElementById('calcular').addEventListener('click', calcular);
+            document.getElementById('toggleUnits').addEventListener('click', toggleUnidades);
+        });
     </script>
 </body>
 </html>
