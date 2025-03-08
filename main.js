@@ -1,10 +1,9 @@
 // Constantes de conversión
 const M3_A_PIES3 = 35.3147; // 1 m³ = 35.3147 pies³
 const KG_A_TON = 0.001;     // 1 kg = 0.001 toneladas
-const KWH_A_MWH = 0.001;    // 1 kWh = 0.001 MWh
 
 // Constantes de costos y precios (valores típicos de la industria)
-const COSTO_CAPITAL_KW = 800;  // USD/kW instalado - ajustado a valores más realistas
+const COSTO_CAPITAL_KW = 800;  // USD/kW instalado - valor realista
 const FACTOR_PLANTA = 0.85;    // Factor de planta típico
 const VIDA_UTIL = 20;          // Años de vida útil
 
@@ -101,7 +100,7 @@ function resetearParametros() {
 function calcular() {
     // Obtener valores de entrada
     const pozosActivos = parseInt(document.getElementById('pozos').value);
-    const gasDisponible = parseInt(document.getElementById('gas').value);
+    const gasDisponible = parseInt(document.getElementById('gas').value); // miles de m³/día
     const GOR = parseInt(document.getElementById('gor').value);
     const eficienciaSeparacion = parseInt(document.getElementById('sep').value);
     const eficienciaCompresion = parseInt(document.getElementById('comp').value);
@@ -111,8 +110,8 @@ function calcular() {
     
     // Determinar si necesitamos recalcular el flujo
     if (!flujoCalculado) {
-        // Cálculos para el proceso - SIN variación aleatoria para mantener consistencia
-        const gasExtraido = gasDisponible * pozosActivos;
+        // Cálculos para el proceso - con unidades en miles de m³/día
+        const gasExtraido = gasDisponible * pozosActivos; // miles de m³/día
         const gasSeparado = gasExtraido * (eficienciaSeparacion/100);
         const gasComprimido = gasSeparado * (eficienciaCompresion/100);
         
@@ -130,25 +129,32 @@ function calcular() {
     // Recuperar valores del flujo calculado
     const { gasExtraido, gasSeparado, gasComprimido, gasNoUtilizado } = window.datosFlujo;
     
+    // Convertir de miles de m³/día a m³/día para los cálculos energéticos
+    const gasComprimidoM3 = gasComprimido * 1000; // Convertir a m³/día
+    
     // Propiedades del gas
     const poderCalorifico = 9400; // kcal/m³
-    const poderCalorificoTotal = gasComprimido * poderCalorifico;
     
-    // Conversión de energía (valores ajustados para más precisión)
-    // 1 kcal = 0.00116222 kWh
-    const factorConversion = 0.00116222;
+    // Conversión de energía (valor preciso)
+    const factorConversion = 0.00116222; // 1 kcal = 0.00116222 kWh
     
-    // Energía térmica y eléctrica (kWh)
-    const energiaTermicaKWh = gasComprimido * poderCalorifico * factorConversion * 1000; // en kWh/día
+    // Cálculo de energía térmica en kWh
+    const energiaTermicaKWh = gasComprimidoM3 * poderCalorifico * factorConversion; // kWh/día
+    
+    // Cálculo de energía eléctrica generada
     const energiaElectricaKWh = energiaTermicaKWh * (eficienciaTurbina/100);
-    const perdidasKWh = energiaElectricaKWh * 0.05; // 5% de pérdidas
+    
+    // Pérdidas en transmisión (5%)
+    const perdidasKWh = energiaElectricaKWh * 0.05;
+    
+    // Energía final entregada
     const energiaEntregadaKWh = energiaElectricaKWh - perdidasKWh;
     
-    // Conversión a MWh para mostrar en la interfaz
-    const energiaTermica = energiaTermicaKWh * KWH_A_MWH;
-    const energiaElectrica = energiaElectricaKWh * KWH_A_MWH;
-    const perdidas = perdidasKWh * KWH_A_MWH;
-    const energiaEntregada = energiaEntregadaKWh * KWH_A_MWH;
+    // Convertir a MWh para mostrar en la interfaz
+    const energiaTermica = energiaTermicaKWh / 1000; // MWh/día
+    const energiaElectrica = energiaElectricaKWh / 1000; // MWh/día
+    const perdidas = perdidasKWh / 1000; // MWh/día
+    const energiaEntregada = energiaEntregadaKWh / 1000; // MWh/día
     
     // Capacidad instalada (kW)
     const capacidadInstalada = energiaElectricaKWh / 24; // kW
@@ -207,10 +213,10 @@ function calcular() {
     
     // Emisiones y residuos con factores más precisos
     // Factores de emisión para gas natural: CO2 = 2.1 kg/m³, NOx = 0.0018 kg/m³, SO2 = 0.00068 kg/m³
-    const emisionesCO2 = gasComprimido * 2.1; // kg CO2/día
-    const emisionesNOx = gasComprimido * 0.0018; // kg NOx/día
-    const emisionesSO2 = gasComprimido * 0.00068; // kg SO2/día
-    const emisionesCH4 = gasComprimido * 0.001; // kg CH4/día (fugas)
+    const emisionesCO2 = gasComprimidoM3 * 0.0021; // kg CO2/día
+    const emisionesNOx = gasComprimidoM3 * 0.0000018; // kg NOx/día
+    const emisionesSO2 = gasComprimidoM3 * 0.00000068; // kg SO2/día
+    const emisionesCH4 = gasComprimidoM3 * 0.000001; // kg CH4/día (fugas)
     
     // Huella de carbono e impacto ambiental
     const intensidadCarbono = emisionesCO2 / energiaEntregada;
@@ -218,10 +224,10 @@ function calcular() {
     
     // Cálculos ambientales anuales
     const emisionesAnualesCO2 = emisionesCO2 * 365 * KG_A_TON;
-    const emisionsAhorradasFlaring = gasExtraido * 2.8 * 365 * KG_A_TON - emisionesAnualesCO2;
+    const emisionsAhorradasFlaring = gasExtraido * 1000 * 0.0028 * 365 * KG_A_TON - emisionesAnualesCO2;
     const emisionsAhorradasCoal = (900 - intensidadCarbono) * energiaEntregada * 365 * KG_A_TON;
     const emisionsAhorradasOil = (700 - intensidadCarbono) * energiaEntregada * 365 * KG_A_TON;
-    const emisionsAhorradasVenting = gasExtraido * 2.8 * 25 * 365 * KG_A_TON - emisionesAnualesCO2; // CH4 tiene 25 veces más GWP
+    const emisionsAhorradasVenting = gasExtraido * 1000 * 0.0028 * 25 * 365 * KG_A_TON - emisionesAnualesCO2; // CH4 tiene 25 veces más GWP
     const equivalenteArboles = emisionsAhorradasFlaring * 42; // 1 ton CO2 = ~42 árboles/año
     
     // Guardar resultados para exportación
@@ -252,7 +258,7 @@ function calcular() {
             gastos,
             beneficio,
             retornoInversion,
-            breakeven: breakeven * KWH_A_MWH, // Convertido a MWh para mostrar
+            breakeven: breakeven / 1000, // Convertido a MWh para mostrar
             ingresosAnuales,
             gastosAnuales,
             beneficioAnual,
@@ -300,7 +306,7 @@ function calcular() {
     document.getElementById('beneficio').className = beneficio > 0 ? "value positive" : "value negative";
     document.getElementById('roi').textContent = retornoInversion.toFixed(1) + " %";
     document.getElementById('roi').className = retornoInversion > 0 ? "value positive" : "value negative";
-    document.getElementById('breakeven').textContent = (breakeven * KWH_A_MWH).toFixed(2) + " MWh/día";
+    document.getElementById('breakeven').textContent = (breakeven / 1000).toFixed(2) + " MWh/día";
     
     document.getElementById('co2').textContent = convertirEmisiones(emisionesCO2);
     document.getElementById('nox').textContent = convertirEmisiones(emisionesNOx);
