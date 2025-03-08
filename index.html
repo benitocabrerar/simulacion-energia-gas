@@ -687,7 +687,20 @@
             Operación completada con éxito
         </div>
     </div>
+<script>
+    // Añadir esto justo antes de cargar los scripts
+    console.log('Preparando carga de scripts');
+    
+    function verificarScript(scriptName) {
+        console.log(scriptName + ' cargado correctamente');
+    }
+</script>
 
+<!-- Scripts JavaScript con verificación -->
+<script src="main.js" onload="verificarScript('main.js')" onerror="console.error('Error cargando main.js')"></script>
+<script src="charts.js" onload="verificarScript('charts.js')" onerror="console.error('Error cargando charts.js')"></script>
+<script src="export.js" onload="verificarScript('export.js')" onerror="console.error('Error cargando export.js')"></script>
+<script src="config.js" onload="verificarScript('config.js')" onerror="console.error('Error cargando config.js')"></script>
     <!-- Scripts JavaScript -->
     <script src="main.js"></script>
     <script src="charts.js"></script>
