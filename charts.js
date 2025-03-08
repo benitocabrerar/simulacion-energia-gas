@@ -484,6 +484,55 @@ function actualizarGraficos(datos) {
                 }
             }
         });
+        // Gráfico de comparación de emisiones entre gas y diésel
+if (emissionComparisonChart) {
+    emissionComparisonChart.destroy();
+}
+
+const ctxEmissionComparison = document.getElementById('emissionComparisonChart').getContext('2d');
+emissionComparisonChart = new Chart(ctxEmissionComparison, {
+    type: 'bar',
+    data: {
+        labels: ['CO₂', 'NOx', 'SO₂'],
+        datasets: [
+            {
+                label: 'Gas Natural (Este Proyecto)',
+                data: [
+                    datos.emisionesCO2,
+                    datos.emisionesNOx,
+                    datos.emisionesSO2
+                ],
+                backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Generación con Diésel',
+                data: [
+                    datos.emisionesCO2Diesel,
+                    datos.emisionesNOxDiesel,
+                    datos.emisionesSO2Diesel
+                ],
+                backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                borderColor: 'rgba(231, 76, 60, 1)',
+                borderWidth: 1
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Emisiones (kg/día)'
+                }
+            }
+        }
+    }
+});
         
         // Gráfico de composición de emisiones
         if (emissionsCompositionChart) {
