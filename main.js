@@ -20,6 +20,11 @@ function actualizarValor(id) {
     document.getElementById(id + 'Value').textContent = document.getElementById(id).value;
     flujoCalculado = false; // Resetear la bandera de cálculo cuando cambia algún valor
     calcular(); // Recalcular automáticamente al cambiar cualquier valor
+    
+    // Actualizar específicamente la comparación con diésel si se cambia ese valor
+    if (id === 'costeDiesel') {
+        actualizarComparacionDiesel();
+    }
 }
 
 // Cambiar entre pestañas
@@ -99,6 +104,7 @@ function resetearParametros() {
     
     flujoCalculado = false;
     calcular();
+    actualizarComparacionDiesel(); // Asegurarnos de actualizar la comparación con diésel
     mostrarNotificacion("Parámetros restablecidos");
 }
 
@@ -224,6 +230,7 @@ function calcular() {
     // Ajustados según poder calorífico (relación con valor estándar de 9,400 kcal/m³)
     const factorAjuste = poderCalorifico / 9400;
     const emisionesCO2 = gasComprimidoM3 * 0.0021 * factorAjuste; // kg CO2/día
+    const emisionesNOx = gasComprimidoM3 *const emisionesCO2 = gasComprimidoM3 * 0.0021 * factorAjuste; // kg CO2/día
     const emisionesNOx = gasComprimidoM3 * 0.0000018 * factorAjuste; // kg NOx/día
     const emisionesSO2 = gasComprimidoM3 * 0.00000068 * factorAjuste; // kg SO2/día
     const emisionesCH4 = gasComprimidoM3 * 0.000001 * factorAjuste; // kg CH4/día (fugas)
@@ -240,7 +247,7 @@ function calcular() {
     const emisionsAhorradasVenting = gasExtraido * 1000 * 0.0028 * 25 * factorAjuste * 365 * KG_A_TON - emisionesAnualesCO2; // CH4 tiene 25 veces más GWP
     const equivalenteArboles = emisionsAhorradasFlaring * 42; // 1 ton CO2 = ~42 árboles/año
     
-    // Cálculos de comparación con diésel
+    // Cálculos de comparación con diésel - NUEVA SECCIÓN AÑADIDA
     const costeDiesel = parseFloat(document.getElementById('costeDiesel').value); // USD/kWh
     
     // Cálculos de comparación con diésel
@@ -355,12 +362,13 @@ function calcular() {
     document.getElementById('carbon-intensity').textContent = intensidadCarbono.toFixed(1) + " kg CO₂/MWh";
     document.getElementById('carbon-reduction').textContent = reduccionVsCarbon.toFixed(1) + " %";
     
-    // Actualizar sección de comparación con diésel
-    document.getElementById('costoDiesel').textContent = costoDieselDiario.toFixed(2) + " USD/día";
-    document.getElementById('ahorroDiesel').textContent = ahorroDieselDiario.toFixed(2) + " USD/día";
-    document.getElementById('ahorroDieselAnual').textContent = ahorroDieselAnual.toFixed(0) + " USD/año";
-    document.getElementById('co2DieselEvitado').textContent = co2DieselEvitado.toFixed(1) + " kg/día";
-    document.getElementById('reduccionDiesel').textContent = reduccionDiesel.toFixed(1) + " %";
+    // Actualizar sección de comparación con diésel - NUEVA SECCIÓN AÑADIDA
+    // Intentar actualizar tanto con IDs con guiones como sin guiones
+    actualizarElemento('costoDiesel', 'costo-diesel', costoDieselDiario.toFixed(2) + " USD/día");
+    actualizarElemento('ahorroDiesel', 'ahorro-diesel', ahorroDieselDiario.toFixed(2) + " USD/día");
+    actualizarElemento('ahorroDieselAnual', 'ahorro-diesel-anual', ahorroDieselAnual.toFixed(0) + " USD/año");
+    actualizarElemento('co2DieselEvitado', 'co2-diesel-evitado', co2DieselEvitado.toFixed(1) + " kg/día");
+    actualizarElemento('reduccionDiesel', 'reduccion-diesel', reduccionDiesel.toFixed(1) + " %");
     
     // Pestaña de Proceso
     document.getElementById('flowPozo').textContent = convertirGas(gasExtraido);
@@ -450,6 +458,90 @@ function calcular() {
     });
 }
 
+// Función auxiliar para actualizar elementos del DOM comprobando diferentes formatos de ID
+// NUEVA FUNCIÓN AÑADIDA
+function actualizarElemento(idSinGuion, idConGuion, valor) {
+    const elementoSinGuion = document.getElementById(idSinGuion);
+    const elementoConGuion = document.getElementById(idConGuion);
+    
+    if (elementoSinGuion) {
+        elementoSinGuion.textContent = valor;
+    } else if (elementoConGuion) {
+        elementoConGuion.textContent = valor;
+    } else {
+        console.warn(`No se encontró elemento con ID ${idSinGuion} ni ${idConGuion}`);
+    }
+}
+
+// Función específica para actualizar la comparación con diésel
+// NUEVA FUNCIÓN AÑADIDA
+function actualizarComparacionDiesel() {
+    console.log("Actualizando comparación con diésel...");
+    
+    // Solo continuar si ya tenemos resultados calculados
+    if (!ultimosResultados.produccion || !ultimosResultados.economico || !ultimosResultados.ambiental) {
+        console.log("No hay resultados previos para calcular la comparación con diésel");
+        return;
+    }
+    
+    // Obtener el valor del costo de diésel
+    const costeDiesel = parseFloat(document.getElementById('costeDiesel').value); // USD/kWh
+    console.log("Valor de costeDiesel:", costeDiesel);
+    
+    // Recuperar valores necesarios de ultimosResultados
+    const energiaEntregada = ultimosResultados.produccion.energiaEntregada;
+    const energiaEntregadaKWh = energiaEntregada * 1000; // Convertir de MWh a kWh
+    const ingresos = ultimosResultados.economico.ingresos;
+    const emisionesCO2 = ultimosResultados.ambiental.emisionesCO2;
+    
+    // Realizar los cálculos
+    const costoDieselDiario = energiaEntregadaKWh * costeDiesel; // USD/día
+    const ahorroDieselDiario = costoDieselDiario - ingresos; // USD/día
+    const ahorroDieselAnual = ahorroDieselDiario * 365; // USD/año
+    
+    const emisionesCO2Diesel = energiaEntregadaKWh * 0.7; // kg CO2/día
+    const emisionesNOxDiesel = energiaEntregadaKWh * 0.0025; // kg NOx/día
+    const emisionesSO2Diesel = energiaEntregadaKWh * 0.0015; // kg SO2/día
+    
+    const co2DieselEvitado = emisionesCO2Diesel - emisionesCO2; // kg CO2/día
+    const reduccionDiesel = (co2DieselEvitado / emisionesCO2Diesel) * 100; // Porcentaje
+    
+    // Actualizar los elementos en el DOM - intentar con y sin guiones
+    actualizarElemento('costoDiesel', 'costo-diesel', costoDieselDiario.toFixed(2) + " USD/día");
+    actualizarElemento('ahorroDiesel', 'ahorro-diesel', ahorroDieselDiario.toFixed(2) + " USD/día");
+    actualizarElemento('ahorroDieselAnual', 'ahorro-diesel-anual', ahorroDieselAnual.toFixed(0) + " USD/año");
+    actualizarElemento('co2DieselEvitado', 'co2-diesel-evitado', co2DieselEvitado.toFixed(1) + " kg/día");
+    actualizarElemento('reduccionDiesel', 'reduccion-diesel', reduccionDiesel.toFixed(1) + " %");
+    
+    // Actualizar los valores en ultimosResultados
+    if (!ultimosResultados.comparacionDiesel) {
+        ultimosResultados.comparacionDiesel = {};
+    }
+    
+    ultimosResultados.comparacionDiesel = {
+        costoDieselDiario,
+        ahorroDieselDiario,
+        ahorroDieselAnual,
+        emisionesCO2Diesel,
+        emisionesNOxDiesel,
+        emisionesSO2Diesel,
+        co2DieselEvitado,
+        reduccionDiesel
+    };
+    
+    // Actualizar los gráficos
+    actualizarGraficos({
+        ...ultimosResultados.produccion,
+        ...ultimosResultados.economico,
+        ...ultimosResultados.ambiental,
+        emisionesCO2Diesel,
+        emisionesNOxDiesel,
+        emisionesSO2Diesel
+    });
+    
+    console.log("Comparación con diésel actualizada");
+}
+
 // Mostrar notificación
 function mostrarNotificacion(mensaje, tipo = 'success') {
     const notificacion = document.getElementById('notificacion');
@@ -500,6 +592,10 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     calcular();
+    
+    // Llamar específicamente a actualizarComparacionDiesel después de calcular
+    actualizarComparacionDiesel();
+    
     // Cargar configuraciones guardadas del localStorage
     configuracionesGuardadas = JSON.parse(localStorage.getItem('configuraciones') || '[]');
 });
