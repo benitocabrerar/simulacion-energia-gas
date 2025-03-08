@@ -1,3 +1,71 @@
+// Constantes ambientales para diésel
+const DIESEL_CO2_FACTOR = 2.68; // kg CO2/litro de diésel
+const DIESEL_EFICIENCIA = 3.5; // kWh/litro de diésel (valor típico)
+const DIESEL_NOX_FACTOR = 0.04; // kg NOx/litro de diésel
+const DIESEL_SO2_FACTOR = 0.02; // kg SO2/litro de diésel
+
+// Función principal de cálculo (extracto con las modificaciones para diésel)
+function calcular() {
+    // [Código existente...]
+    
+    // Obtener el costo de generación con diésel
+    const costeDiesel = parseFloat(document.getElementById('costeDiesel').value);
+    
+    // [Código existente para cálculo de energía eléctrica...]
+    
+    // Cálculos comparativos con diésel
+    // Costo diario con diésel
+    const costoDiesel = energiaEntregadaKWh * costeDiesel; // USD/día
+    
+    // Ahorro económico al usar gas en lugar de diésel
+    const ahorroDiesel = costoDiesel - ingresos; // USD/día
+    const ahorroDieselAnual = ahorroDiesel * 365; // USD/año
+    
+    // Cálculos ambientales para diésel
+    // Litros de diésel necesarios para generar la misma electricidad
+    const litrosDiesel = energiaEntregadaKWh / DIESEL_EFICIENCIA; // litros/día
+    
+    // Emisiones de CO2 que se producirían con diésel
+    const emisionesCO2Diesel = litrosDiesel * DIESEL_CO2_FACTOR; // kg CO2/día
+    const emisionesNOxDiesel = litrosDiesel * DIESEL_NOX_FACTOR; // kg NOx/día
+    const emisionesSO2Diesel = litrosDiesel * DIESEL_SO2_FACTOR; // kg SO2/día
+    
+    // CO2 evitado al usar gas en lugar de diésel
+    const co2DieselEvitado = emisionesCO2Diesel - emisionesCO2; // kg CO2/día
+    
+    // Porcentaje de reducción de emisiones respecto a diésel
+    const reduccionDiesel = (co2DieselEvitado / emisionesCO2Diesel) * 100; // %
+    
+    // Incluir en objetos de resultados
+    ultimosResultados.economico.costoDiesel = costoDiesel;
+    ultimosResultados.economico.ahorroDiesel = ahorroDiesel;
+    ultimosResultados.economico.ahorroDieselAnual = ahorroDieselAnual;
+    
+    ultimosResultados.ambiental.emisionesCO2Diesel = emisionesCO2Diesel;
+    ultimosResultados.ambiental.emisionesNOxDiesel = emisionesNOxDiesel;
+    ultimosResultados.ambiental.emisionesSO2Diesel = emisionesSO2Diesel;
+    ultimosResultados.ambiental.co2DieselEvitado = co2DieselEvitado;
+    ultimosResultados.ambiental.reduccionDiesel = reduccionDiesel;
+    
+    // [Resto del código existente...]
+    
+    // Actualizar interfaz con resultados de comparación diésel
+    document.getElementById('costoDiesel').textContent = costoDiesel.toFixed(2) + " USD/día";
+    document.getElementById('ahorroDiesel').textContent = ahorroDiesel.toFixed(2) + " USD/día";
+    document.getElementById('ahorroDieselAnual').textContent = ahorroDieselAnual.toFixed(0) + " USD/año";
+    document.getElementById('co2DieselEvitado').textContent = co2DieselEvitado.toFixed(0) + " kg/día";
+    document.getElementById('reduccionDiesel').textContent = reduccionDiesel.toFixed(1) + " %";
+    
+    // [Resto del código existente...]
+}
+
+// Resetear parámetros a valores por defecto (modificado para incluir costeDiesel)
+function resetearParametros() {
+    // [Código existente...]
+    document.getElementById('costeDiesel').value = 0.31;
+    document.getElementById('costeDieselValue').textContent = 0.31;
+    // [Resto del código existente...]
+}
 // Constantes de conversión
 const M3_A_PIES3 = 35.3147; // 1 m³ = 35.3147 pies³
 const KG_A_TON = 0.001;     // 1 kg = 0.001 toneladas
