@@ -359,6 +359,7 @@ function formatearNombreParametro(key) {
         pozosActivos: "Pozos Activos",
         gasDisponible: "Gas Disponible (miles m³/día)",
         GOR: "GOR (pies³/bbl)",
+        poderCalorifico: "Poder Calorífico (BTU/PCS)", // Agregado poder calorífico
         eficienciaSeparacion: "Eficiencia Separación (%)",
         eficienciaCompresion: "Eficiencia Compresión (%)",
         eficienciaTurbina: "Eficiencia Turbina (%)",
