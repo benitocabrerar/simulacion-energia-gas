@@ -38,6 +38,10 @@
                         <input type="range" min="500" max="5000" step="100" value="1000" id="gor" oninput="actualizarValor('gor')">
                     </div>
                     <div class="control-item">
+                        <label>Poder Calorífico (BTU/PCS): <span id="poderCalorificoValue">1200</span></label>
+                        <input type="range" min="800" max="1800" step="10" value="1200" id="poderCalorifico" oninput="actualizarValor('poderCalorifico')">
+                    </div>
+                    <div class="control-item">
                         <label>Eficiencia Separación (%): <span id="sepValue">85</span></label>
                         <input type="range" min="60" max="98" value="85" id="sep" oninput="actualizarValor('sep')">
                     </div>
@@ -245,7 +249,7 @@
                         <h3>Características del Gas</h3>
                         <div class="data-row">
                             <span>Poder Calorífico:</span>
-                            <span class="value">9,400 kcal/m³</span>
+                            <span class="value" id="poder-calorifico-display">1200 BTU/PCS (9,400 kcal/m³)</span>
                         </div>
                         <div class="data-row">
                             <span>Composición Típica:</span>
@@ -571,7 +575,6 @@
         </div>
     </div>
     <!-- Modificar la sección final del body de index.html para corregir el orden de carga -->
-<!-- Por esto: -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -587,7 +590,6 @@ function verificarCargaScripts() {
         console.warn('Advertencia: html2pdf no está disponible. La exportación a PDF no funcionará');
     }
 }
-
 // Verificar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
     verificarCargaScripts();
