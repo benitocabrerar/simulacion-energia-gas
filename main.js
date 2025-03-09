@@ -1,6 +1,7 @@
 // Constantes de conversión
 const M3_A_PIES3 = 35.3147; // 1 m³ = 35.3147 pies³
 const KG_A_TON = 0.001;     // 1 kg = 0.001 toneladas
+const BTU_A_KCAL_M3 = 7.83333; // Factor de conversión aproximado: 1 BTU/PCS ≈ 7.83333 kcal/m³
 
 // Constantes de costos y precios (valores típicos de la industria)
 const COSTO_CAPITAL_KW = 800;  // USD/kW instalado - valor realista
@@ -100,6 +101,7 @@ function resetearParametros() {
     document.getElementById('pozos').value = 5;
     document.getElementById('gas').value = 100;
     document.getElementById('gor').value = 1000;
+    document.getElementById('poderCalorifico').value = 1200; // Valor por defecto del poder calorífico
     document.getElementById('sep').value = 85;
     document.getElementById('comp').value = 90;
     document.getElementById('turb').value = 38;
@@ -110,6 +112,7 @@ function resetearParametros() {
     document.getElementById('pozosValue').textContent = 5;
     document.getElementById('gasValue').textContent = 100;
     document.getElementById('gorValue').textContent = 1000;
+    document.getElementById('poderCalorificoValue').textContent = 1200; // Actualizar texto del poder calorífico
     document.getElementById('sepValue').textContent = 85;
     document.getElementById('compValue').textContent = 90;
     document.getElementById('turbValue').textContent = 38;
@@ -126,6 +129,7 @@ function calcular() {
     const pozosActivos = parseInt(document.getElementById('pozos').value);
     const gasDisponible = parseInt(document.getElementById('gas').value); // miles de m³/día
     const GOR = parseInt(document.getElementById('gor').value);
+    const poderCalorifico = parseInt(document.getElementById('poderCalorifico').value); // BTU/PCS
     const eficienciaSeparacion = parseInt(document.getElementById('sep').value);
     const eficienciaCompresion = parseInt(document.getElementById('comp').value);
     const eficienciaTurbina = parseInt(document.getElementById('turb').value);
@@ -141,14 +145,14 @@ function calcular() {
     // Convertir de miles de m³/día a m³/día para los cálculos energéticos
     const gasComprimidoM3 = gasComprimido * 1000; // Convertir a m³/día
     
-    // Propiedades del gas
-    const poderCalorifico = 9400; // kcal/m³
+    // Propiedades del gas - Usar el poder calorífico del deslizante
+    const poderCalorificoKcalM3 = poderCalorifico * BTU_A_KCAL_M3; // Convertir BTU/PCS a kcal/m³
     
     // Conversión de energía (valor preciso)
     const factorConversion = 0.00116222; // 1 kcal = 0.00116222 kWh
     
     // Cálculo de energía térmica en kWh
-    const energiaTermicaKWh = gasComprimidoM3 * poderCalorifico * factorConversion; // kWh/día
+    const energiaTermicaKWh = gasComprimidoM3 * poderCalorificoKcalM3 * factorConversion; // kWh/día
     
     // Cálculo de energía eléctrica generada
     const energiaElectricaKWh = energiaTermicaKWh * (eficienciaTurbina/100);
@@ -244,6 +248,7 @@ function calcular() {
             pozosActivos,
             gasDisponible,
             GOR,
+            poderCalorifico,
             eficienciaSeparacion,
             eficienciaCompresion,
             eficienciaTurbina,
@@ -326,6 +331,12 @@ function calcular() {
         capacidadInstalada: capacidadInstalada,
         reduccionVsCarbon: reduccionVsCarbon
     };
+    
+    // Actualizar el campo de características del gas en la pestaña de proceso
+    if (document.getElementById('poder-calorifico-display')) {
+        document.getElementById('poder-calorifico-display').textContent = 
+            `${poderCalorifico} BTU/PCS (${poderCalorificoKcalM3.toFixed(0)} kcal/m³)`;
+    }
     
     // Actualizar interfaz con resultados
     actualizarInterfazConResultados();
