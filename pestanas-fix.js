@@ -250,6 +250,11 @@ function diagnosticarYSolucionarGraficos() {
     return true;
 }
 
+// Ejecutar diagnóstico automáticamente después de un tiempo
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(diagnosticarYSolucionarGraficos, 2000);
+});
+
 // Función para mostrar mensaje de error
 function mostrarMensajeError(mensaje) {
     // Verificar si ya existe un mensaje
