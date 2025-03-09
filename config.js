@@ -11,6 +11,7 @@ function guardarConfiguracion() {
     const pozos = parseInt(document.getElementById('pozos').value);
     const gas = parseInt(document.getElementById('gas').value);
     const gor = parseInt(document.getElementById('gor').value);
+    const poderCalorifico = parseInt(document.getElementById('poderCalorifico').value); // Incluir poder calorífico
     const sep = parseInt(document.getElementById('sep').value);
     const comp = parseInt(document.getElementById('comp').value);
     const turb = parseInt(document.getElementById('turb').value);
@@ -21,7 +22,7 @@ function guardarConfiguracion() {
         id: Date.now(), // Usar timestamp como ID único
         nombre: nombre,
         fecha: new Date().toLocaleDateString(),
-        valores: { pozos, gas, gor, sep, comp, turb, precio, costo }
+        valores: { pozos, gas, gor, poderCalorifico, sep, comp, turb, precio, costo } // Incluir poder calorífico
     };
     
     // Añadir a la lista de configuraciones guardadas
@@ -49,6 +50,17 @@ function cargarConfiguracion(id) {
     document.getElementById('pozos').value = configuracion.valores.pozos;
     document.getElementById('gas').value = configuracion.valores.gas;
     document.getElementById('gor').value = configuracion.valores.gor;
+    
+    // Verificar si la configuración antigua tiene el valor de poder calorífico
+    if (configuracion.valores.poderCalorifico !== undefined) {
+        document.getElementById('poderCalorifico').value = configuracion.valores.poderCalorifico;
+        document.getElementById('poderCalorificoValue').textContent = configuracion.valores.poderCalorifico;
+    } else {
+        // Si es una configuración antigua sin poder calorífico, usar el valor por defecto
+        document.getElementById('poderCalorifico').value = 1200;
+        document.getElementById('poderCalorificoValue').textContent = 1200;
+    }
+    
     document.getElementById('sep').value = configuracion.valores.sep;
     document.getElementById('comp').value = configuracion.valores.comp;
     document.getElementById('turb').value = configuracion.valores.turb;
